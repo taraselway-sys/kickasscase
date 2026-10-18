@@ -42,7 +42,7 @@ var CT_BEFORE={
   ['Public participation','If the problem was that the public had no chance to comment, § 2-3-114, MCA, lets you petition to set the decision aside, also within 30 days.'],
   ['Evidence','The agenda, the minutes, the recording, and any notice of the meeting. Download them the day you find them.']],
  hrb:[
-  ['The deadline','90 days from the date the Bureau issues its notice of dismissal. Miss it and the claim is barred, under § 49-2-512, MCA.'],
+  ['The deadline','90 days from the date the Bureau issues its notice of dismissal, or from the final agency decision if you objected to the Commission. Miss it and the claim is barred, under §§ 49-2-511 and 49-2-512, MCA.'],
   ['When you can ask','The Bureau must dismiss the complaint if 12 months pass after filing with no hearing. You can then file in district court.'],
   ['Where to file','In the judicial district where the discrimination happened.'],
   ['The claims','Use the same claims you named before the Bureau. The court can award the relief in § 49-2-506, MCA, and may award fees and costs.']],
@@ -98,7 +98,7 @@ function courtDates(){
     detail:'30 days from when you learned of the decision ('+niceDate(c.meetings.f.learned)+').',kind:'urgent'});
   if(c.hrb&&c.hrb.f.dismissed) out.push({key:'ct-hrb',date:addDays(c.hrb.f.dismissed,90),label:'District court: last day to file after the Bureau',
     detail:'90 days from the notice of dismissal ('+niceDate(c.hrb.f.dismissed)+').',kind:'urgent'});
-  if(c.wdea&&c.wdea.f.fired) out.push({key:'ct-wdea',date:addDays(c.wdea.f.fired,365),label:'Wrongful discharge: last day to file',
+  if(c.wdea&&c.wdea.f.fired) out.push({key:'ct-wdea',date:(window.addYears?addYears(c.wdea.f.fired,1):addDays(c.wdea.f.fired,365)),label:'Wrongful discharge: last day to file',
     detail:'1 year from the firing ('+niceDate(c.wdea.f.fired)+'). An internal appeal can add up to 120 days.',kind:'file'});
   return out;
 }
@@ -167,7 +167,7 @@ function renderCtStatus(){
   var due=null, label='';
   if(cur==='meetings'&&d.f.learned){ due=addDays(d.f.learned,30); label='Last day to file'; }
   if(cur==='hrb'&&d.f.dismissed){ due=addDays(d.f.dismissed,90); label='Last day to file'; }
-  if(cur==='wdea'&&d.f.fired){ due=addDays(d.f.fired,365); label='Last day to file, before any appeal time'; }
+  if(cur==='wdea'&&d.f.fired){ due=(window.addYears?addYears(d.f.fired,1):addDays(d.f.fired,365)); label='Last day to file, before any appeal time'; }
   if(due){ var left=daysBetween(todayISO(),due); cls=left<0?'bad':(left<=14?'warn':'');
     msg='<b>'+(left<0?'Passed':dayWord(left)+' left')+'</b><span>'+label+': '+esc(niceDate(due))+'</span>'; }
   if(cur==='small'&&d.f.amount){ var n=parseFloat(String(d.f.amount).replace(/[^0-9.]/g,''));
@@ -225,7 +225,7 @@ function ctBody(t,d){
   if(t==='hrb'){
     S.push(['PARTIES',[(me.name||'[Your name]')+' filed a complaint with the Montana Human Rights Bureau'+(f.hrbno?', Case No. '+f.hrbno:'')+(f.filed?', on '+niceDate(f.filed):'')+'.',
       party+' is the respondent named in that complaint.']]);
-    S.push(['JURISDICTION AND VENUE',['The Department of Labor and Industry issued its notice of dismissal'+(f.dismissed?' on '+niceDate(f.dismissed):'')+'. This action is filed within 90 days of that notice, as § 49-2-512, MCA, requires.',
+    S.push(['JURISDICTION AND VENUE',['The Department of Labor and Industry issued its notice of dismissal'+(f.dismissed?' on '+niceDate(f.dismissed):'')+'. This action is filed within the 90 days allowed by §§ 49-2-511 and 49-2-512, MCA.',
       'Venue is proper in this district because the discrimination occurred in '+county+' County.']]);
     S.push(['FACTS',facts.length?facts:['[What happened, in date order.]']]);
     S.push(['CLAIMS',[(f.claims||'[Name every claim]')+', in violation of the Montana Human Rights Act, Title 49, Chapter 2, MCA.']]);
@@ -323,7 +323,7 @@ function ctDemand(){
 function initCourt(){
   addView('court','Court filings','Draft filings for district court and small claims, outside the Human Rights Bureau.',
     '<div class="card ctool"><h3 style="margin-top:0">What are you filing?</h3><div id="ct-list"></div></div><div id="ct-work"></div>');
-  addMenuLink('records','court','Court filings','⚖');
+  addMenuLink('records','court','Court filings','▧');
   var _all=allDates; window.allDates=function(){ var a=_all().concat(courtDates()); a.sort(function(x,y){ return x.date<y.date?-1:(x.date>y.date?1:0); }); return a; };
   var _sh=window.show; window.show=function(id){ _sh(id); if(id==='court') renderCourt(); };
   renderCourt();

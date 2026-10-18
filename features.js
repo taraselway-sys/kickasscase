@@ -306,6 +306,8 @@ function allDates(){
       detail:'Must be received by 5:00 p.m. 14 days from the date on the letter ('+niceDate(D.dates.dismiss)+'). Not postmarked: received.',kind:'urgent'});
     out.push({key:'brief',date:addDays(D.dates.dismiss,21),label:'Opening brief to the Commission',
       detail:'21 calendar days from the decision to dismiss. Confirm the exact date with the Commission.',kind:'urgent'});
+    out.push({key:'dc90',date:addDays(D.dates.dismiss,90),label:'District court: last day to sue instead',
+      detail:'90 days from the final agency decision under \u00a7 49-2-511, MCA. If you object to the Commission, the 90 days run from its order instead.',kind:'urgent'});
   }
   D.docs.forEach(function(e){ if(e.due) out.push({key:'doc-'+e.id,date:e.due,label:e.a||('Due: '+e.w),detail:e.w+(e.f?' \u00b7 '+e.f:''),kind:'doc'}); });
   out.sort(function(a,b){ return a.date<b.date?-1:(a.date>b.date?1:0); });
@@ -569,7 +571,7 @@ function buildPacket(){
   if(!parts.length && !s.cover){ alert('Pick at least one part to include.'); return; }
   var cover='';
   if(s.cover){
-    cover='<section class="pkcover"><h1>Case file</h1>'+
+    cover='<section class="pkcover"><h1>Case packet</h1>'+
       (c['cp-name']?'<p class="pkline"><b>Charging party:</b> '+esc(c['cp-name'])+'</p>':'')+
       (c['cp-resp']?'<p class="pkline"><b>Respondent:</b> '+esc(c['cp-resp'])+'</p>':'')+
       (c['cp-grounds']?'<p class="pkline"><b>Basis:</b> '+esc(c['cp-grounds'])+'</p>':'')+
@@ -586,10 +588,10 @@ function buildPacket(){
 
 /* ================= home dashboard ================= */
 var HOME_TOOLS=[
- ['Build your case file',[['timeline','☰'],['exhibits','▣'],['witnesses','✎'],['docs','✉'],['records','▤'],['dates','⧗'],['packet','⎘']]],
+ ['Build your case file',[['timeline','☰'],['exhibits','▣'],['witnesses','✎'],['docs','✉'],['records','▤'],['deadline','◷'],['dates','⧗'],['packet','⎘']]],
  ['Court filings, outside the Bureau',[['ct:records'],['ct:meetings'],['ct:wdea'],['ct:small'],['ct:hrb']]],
  ['Family court',[['parenting','♡'],['decree','⧉']]],
- ['A discrimination complaint with the Human Rights Bureau',[['complaint','☑'],['deadline','◷'],['stage','◴'],['rebuttal','⇄'],['damages','¤'],['mediation','⚖'],['nocause','⚠']]],
+ ['A discrimination complaint with the Human Rights Bureau',[['complaint','☑'],['stage','◴'],['rebuttal','⇄'],['damages','¤'],['mediation','⚖'],['nocause','⚠']]],
  ['Support',[['ai','⌘'],['care','❦'],['checklist','✓'],['howto','ⓘ']]]];
 function viewInfo(v){
   var sec=$('v-'+v); if(!sec) return {t:v,d:''};
@@ -608,7 +610,7 @@ function buildHome(){
     '<div id="install-list"></div>'+
     '<div class="dsec"><div class="dhead"><h3>What you can do here</h3></div><div class="scope">'+
       '<button type="button" class="scopecard" onclick="show(\'timeline\')"><span class="ticon">☰</span><b>Build a case file</b><span>A dated chronology, an evidence index, witnesses, letters and deadlines. Useful for any dispute.</span></button>'+
-      '<button type="button" class="scopecard" onclick="show(\'court\')"><span class="ticon">▧</span><b>Go to court</b><span>Public records, open meetings, wrongful discharge and small claims.</span></button>'+
+      '<button type="button" class="scopecard" onclick="show(\'court\')"><span class="ticon">▧</span><b>Go to court</b><span>Public records, open meetings, discrimination after the Bureau, wrongful discharge and small claims.</span></button>'+
       '<button type="button" class="scopecard" onclick="show(\'parenting\')"><span class="ticon">♡</span><b>Family court</b><span>A parenting plan and a divorce decree, following Montana’s official court forms.</span></button>'+
       '<button type="button" class="scopecard" onclick="show(\'complaint\')"><span class="ticon">☑</span><b>File with the Human Rights Bureau</b><span>A discrimination complaint, from intake to mediation.</span></button>'+
     '</div><p class="scopestate"><b>Montana state cases only.</b> Everything here is for Montana state courts and state agencies, such as district court, justice court and the Human Rights Bureau. It does not prepare filings for federal court.</p></div>'+
@@ -632,7 +634,7 @@ function buildHome(){
 }
 function nextStep(){
   var c=D.claims||{}, lb=D.meta&&D.meta.lastBackup, days=lb?Math.floor((Date.now()-Date.parse(lb))/864e5):null;
-  if(!(D.deadline&&D.deadline.last)) return ['deadline','Work out your filing deadline','180 days from the most recent act. It is the single most common reason a good claim is lost.','Open the deadline calculator'];
+  if(!(D.deadline&&(D.deadline.last||Object.keys(D.deadline.dates||{}).some(function(k){ return D.deadline.dates[k]; })))) return ['deadline','Work out your filing deadline','Missing a deadline is the single most common reason a good claim is lost.','Open the deadline calculator'];
   if(!D.events.length) return ['timeline','Start your chronology','Every date, one line each. This becomes your complaint.','Add your first entry'];
   if(!(c.claims&&c.claims.length)) return ['complaint','Work out what you are claiming','Only what you name gets investigated. Four questions on the Complaint page.','Answer the four questions'];
   if(!D.exhibits.length) return ['exhibits','Log your first exhibit','Your files live in Google Drive. The index here is what makes them usable.','Open your evidence'];
@@ -764,7 +766,7 @@ function buildFurniture(){
     sn.innerHTML='<p class="snl"><b>This page is for a discrimination complaint to the Montana Human Rights Bureau.</b></p>'+
       '<p>The Bureau handles unfair treatment because of a protected ground, such as sex, race, age, disability or religion, and retaliation for complaining about it.</p>'+
       '<p class="snq">Something else? Court filings drafts these:</p><div class="snlinks">'+
-      [['records','Public records'],['meetings','Open meeting'],['wdea','Wrongful discharge'],['small','Small claims']].map(function(x){
+      [['records','Public records'],['meetings','Open meeting'],['wdea','Wrongful discharge'],['small','Small claims'],['hrb','After the Bureau dismisses']].map(function(x){
         return '<button type="button" class="lchip" onclick="show(\'court\');ctPick(\''+x[0]+'\')">'+x[1]+' \u2192</button>'; }).join('')+'</div>';
     cth.parentNode.insertBefore(sn,cth); }
   // complaint: claim wizard before the form, length meter under the particulars
