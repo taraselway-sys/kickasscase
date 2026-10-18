@@ -1190,13 +1190,18 @@ function boot(){ if(booted) return; booted=true; if(window.initFeatures) initFea
 function registerSW(){
   try{ if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(function(){}); }catch(e){}
 }
-setTimeout(boot, 3000); // never leave the page blank if IndexedDB hangs
-idbOpen().then(function(db){
-  IDB=db; return db ? idbGet() : null;
-}).then(function(rec){
-  if(booted) return;
-  var fromIdb=null; try{ fromIdb=rec?JSON.parse(rec):null; }catch(e){}
-  var ta=fromIdb&&fromIdb.meta&&fromIdb.meta.savedAt||'', tb=lsData&&lsData.meta&&lsData.meta.savedAt||'';
-  if(fromIdb && (!lsData || ta>=tb)) D=Object.assign(blankD(), fromIdb);
-  else if(IDB && lsData) idbChain=idbPut(JSON.stringify(D)); // first run: copy existing work into IndexedDB
-}).catch(function(){}).then(boot);
+/* Start only after every script on the page has loaded (features.js comes after this file).
+   The database can answer before a slow download finishes, so waiting here matters. */
+function whenPageReady(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
+whenPageReady(function(){
+  setTimeout(boot, 3000); // never leave the page blank if IndexedDB hangs
+  idbOpen().then(function(db){
+    IDB=db; return db ? idbGet() : null;
+  }).then(function(rec){
+    if(booted) return;
+    var fromIdb=null; try{ fromIdb=rec?JSON.parse(rec):null; }catch(e){}
+    var ta=fromIdb&&fromIdb.meta&&fromIdb.meta.savedAt||'', tb=lsData&&lsData.meta&&lsData.meta.savedAt||'';
+    if(fromIdb && (!lsData || ta>=tb)) D=Object.assign(blankD(), fromIdb);
+    else if(IDB && lsData) idbChain=idbPut(JSON.stringify(D)); // first run: copy existing work into IndexedDB
+  }).catch(function(){}).then(boot);
+});
