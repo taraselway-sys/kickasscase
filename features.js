@@ -629,7 +629,7 @@ function buildHome(){
       '<div class="herobody"><div class="herotag">Build your case. File it. See it through.</div>'+
       '<p class="herolead">Free tools for people representing themselves in Montana courts and state agencies.</p>'+
       '<div class="herobadges"><span>'+ico('gift')+'Free</span><span>'+ico('shield-check')+'Nothing leaves your phone</span><span>'+ico('map-pin')+'Montana state cases</span></div>'+
-      '<div id="nextstep-list"></div></div></div>'+
+      '</div></div>'+
     '<div id="install-list"></div>'+
     '<div class="dsec reveal"><div class="dhead"><h3>What kind of case is this?</h3></div><div class="paths">'+
       HOME_PATHS.map(function(p){ return '<button type="button" class="pathcard p-'+p[0]+'" onclick="pickPath(\''+p[0]+'\')"><span class="pathi">'+ico(p[3])+'</span><span class="patht"><b>'+esc(p[1])+'</b><span>'+esc(p[2])+'</span></span><span class="pathgo">'+ico('arrow-right')+'</span></button>'; }).join('')+
@@ -672,7 +672,7 @@ function nextStep(){
 function renderHome(){
   if(!$('dash-list')) return;
   var n=nextStep();
-  $('nextstep-list').innerHTML='<div class="next"><div class="nk">Your next step</div><div class="nt">'+esc(n[1])+'</div><div class="nd">'+esc(n[2])+'</div>'+
+  if($('nextstep-list')) $('nextstep-list').innerHTML='<div class="next"><div class="nk">Your next step</div><div class="nt">'+esc(n[1])+'</div><div class="nd">'+esc(n[2])+'</div>'+
     '<button class="pri" onclick="'+(n[0]==='backup'?'exportAll()':"show('"+n[0]+"')")+'">'+esc(n[3])+' →</button></div>';
   // at a glance
   var last=D.deadline&&D.deadline.last, left=null, due='';
