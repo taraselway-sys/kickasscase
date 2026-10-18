@@ -943,8 +943,8 @@ function askOpenPass(obj){
 }
 /* ---- notices: storage full, backup reminder ---- */
 var noticeKind='';
-function showNotice(kind, html){ var n=$('notice'); noticeKind=kind; n.className='on'+(kind==='full'?' warn':''); n.innerHTML=html; }
-function hideNotice(){ var n=$('notice'); if(n){ n.className=''; n.innerHTML=''; } noticeKind=''; }
+function showNotice(kind, html){ var n=$(kind==='backup'&&$('bnotice')?'bnotice':'notice'); noticeKind=kind; n.className='on'+(kind==='full'?' warn':''); n.innerHTML=html; }
+function hideNotice(){ ['notice','bnotice'].forEach(function(id){ var n=$(id); if(n){ n.className=''; n.innerHTML=''; } }); noticeKind=''; }
 function saveFailed(){
   showNotice('full','<p><b>Your last change could not be saved.</b> The storage this browser gives the Case Builder is full. '+
     'Export a backup now so nothing is lost, then remove some evidence thumbnails to free space.</p>'+
@@ -975,7 +975,7 @@ function buildIndex(){
     var els=v.querySelectorAll('h3,h4,summary,p,li,td,blockquote,.gterm,.ilab');
     for(var j=0;j<els.length;j++){
       var e=els[j];
-      if(e.closest('.printout,.srchwrap,#notice,#iostip,[id$="-list"],[id$="-out"],.pvbar')) continue;
+      if(e.closest('.printout,.srchwrap,#notice,#bnotice,#iostip,[id$="-list"],[id$="-out"],.pvbar')) continue;
       if(e.querySelector('p,li,h3,h4')) continue;
       var t=textOf(e).replace(/\s+/g,' ').replace(/\s+([,.;:!?’])/g,'$1').trim();
       if(t.length<3) continue;

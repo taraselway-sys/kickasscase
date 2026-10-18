@@ -132,6 +132,9 @@ color:var(--navy);font-size:13px;font-weight:650;line-height:1.3}
 input[type=password]{width:100%;font:inherit;font-size:16px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;color:inherit}
 input[type=password]:focus{outline:none;border-color:var(--blue)}
 button:disabled{opacity:.6;cursor:default}
+#bnotice{display:none;max-width:728px;margin:0 auto 16px;padding:13px 15px;border-radius:11px;border-left:4px solid var(--navy);background:var(--tint)}
+#bnotice.on{display:block} #bnotice p{margin:0 0 10px;font-size:14px;line-height:1.5} #bnotice .row{margin:0}
+@media (max-width:760px){ #bnotice{margin:0 16px 16px} }
 #notice.on{display:block} #notice.warn{border-left-color:#b42318;background:#fdf1f0}
 #notice p{margin:0 0 10px;font-size:14px;line-height:1.5} #notice .row{margin:0}
 
@@ -326,7 +329,7 @@ body.printframe .printframe-body{max-width:none}
   body[data-printing] .ptarget{display:block !important;border:0 !important;padding:0 !important;margin:0 !important;box-shadow:none !important}
   /* printing from the browser's own menu: print the page you are on, without the app's chrome */
   body:not([data-printing]) header, body:not([data-printing]) nav, body:not([data-printing]) .band,
-  body:not([data-printing]) footer, #drop, #scrim, #moresheet, #morescrim, #notice{display:none !important}
+  body:not([data-printing]) footer, #drop, #scrim, #moresheet, #morescrim, #notice, #bnotice{display:none !important}
   body.printframe{margin:0;padding:0;background:#fff}
   .noprint{display:none !important}
   .printout{border:0;padding:0;margin:0}
