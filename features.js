@@ -16,6 +16,7 @@ function exNum(id){ return idxOf(D.exhibits,id)+1; }
 function short(t,n){ t=String(t||''); n=n||60; return t.length>n? t.slice(0,n-1).trim()+'\u2026' : t; }
 var MONTHS_F=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function niceDate(x){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(x||''); return m? MONTHS_F[+m[2]-1]+' '+(+m[3])+', '+m[1] : (x||''); }
+function hrbDue(d){ return window.limCompute? limCompute(limByKey('hrb'),d,{}).due : addDays(d,180); }
 function addDays(iso,n){ var d=new Date(iso+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
 function todayISO(){ var d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
 function daysBetween(a,b){ return Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/864e5); }
@@ -289,7 +290,7 @@ function renderDocs(){
 function allDates(){
   D.dates=D.dates||{};
   var out=[], last=D.deadline&&D.deadline.last;
-  if(last) out.push({key:'file',date:addDays(last,180),label:'Last day to file with the Human Rights Bureau',
+  if(last) out.push({key:'file',date:hrbDue(last),label:'Last day to file with the Human Rights Bureau',
     detail:'180 days from the most recent act you entered ('+niceDate(last)+').',kind:'file'});
   D.events.forEach(function(e){
     if((e.tags||[]).indexOf('retaliation')>-1) out.push({key:'ret-'+e.id,date:addDays(e.d,180),
@@ -646,8 +647,12 @@ function renderHome(){
     '<button class="pri" onclick="'+(n[0]==='backup'?'exportAll()':"show('"+n[0]+"')")+'">'+esc(n[3])+' →</button></div>';
   // at a glance
   var last=D.deadline&&D.deadline.last, left=null, due='';
-  if(last){ due=addDays(last,180); left=daysBetween(todayISO(),due); }
-  var dl= last? (left<0? '<b class="bad">Passed</b><span>180 days ended '+esc(niceDate(due))+'</span>'
+  if(last){ due=hrbDue(last); left=daysBetween(todayISO(),due); }
+  var lc=window.limCurrent?limCurrent():null;
+  if(lc){ last=lc.from; due=lc.date; left=daysBetween(todayISO(),due); }
+  var dl= lc? (left<0? '<b class="bad">Passed</b><span>'+esc(lc.L[2])+' · ended '+esc(niceDate(due))+'</span>'
+      : '<b class="'+(left<=30?'warn':'')+'">'+left+'</b><span>days left · '+esc(lc.L[2])+' · '+esc(niceDate(due))+'</span>') :
+      last? (left<0? '<b class="bad">Passed</b><span>180 days ended '+esc(niceDate(due))+'</span>'
       : '<b class="'+(left<=30?'warn':'')+'">'+left+'</b><span>days left to file with the Bureau · '+esc(niceDate(due))+'</span>')
       : '<b class="mut">—</b><span>Set your deadline</span>';
   var tile=function(view,inner,cls){ return '<button type="button" class="gtile'+(cls?' '+cls:'')+'" onclick="show(\''+view+'\')">'+inner+'</button>'; };
@@ -863,6 +868,7 @@ function initFeatures(){
   window.iosTip=function(){ renderInstall(); };   // the install card replaces the older tip
   if(window.initCourt) initCourt();
   if(window.initFamily) initFamily();
+  if(window.initLimits) initLimits();
   buildFurniture();
   layoutAllPages();
   // show() also refreshes the new pages

@@ -240,7 +240,7 @@ function _printComplaintForm(ret){
   }
   D.complaint=f; try{ save(); }catch(e){}
   if(!f['cp-name'] && !f['cp-resp'] && !f['cp-grounds'] && !D.events.length){
-    if(ret) return ''; alert('Fill in at least your name or the respondent first, then try again.'); return; }
+    if(!ret){ alert('Fill in at least your name or the respondent first, then try again.'); return; } }
   // build the plain text first, so there is always a readable version on the page
   try{ buildComplaint(); }catch(e){}
   var picked=(f['cp-grounds']||'').toLowerCase();
@@ -305,6 +305,7 @@ function _printComplaintForm(ret){
       '<div class="hval">Earliest: '+esc(nice(f['cp-first']))+'</div>'+
       '<div class="hval" style="margin-top:8pt">Latest: '+esc(nice(f['cp-last']))+'</div></td>'+
    '</tr></table>'+
+   '<div class="hbody">'+
    '<div class="hsec">PARTICULARS OF THE CHARGE</div>'+
    '<p class="hintro">I believe I have been '+how+' in the area of '+esc(area)+
      ' in violation of the Montana Human Rights Act (MHRA)'+(gov?', and the Governmental Code of Fair Practices (GCFP),':',')+
@@ -317,6 +318,7 @@ function _printComplaintForm(ret){
     '<li>I swear or affirm that I have read the above charge and I declare under penalty of perjury that the foregoing is true and correct.</li>'+
    '</ul>'+
    '<div class="hsig"><span>Signature: <span class="hline"></span></span><span>Date: <span class="hline short"></span></span></div>'+
+   '</div><div class="hrev">Revised 8/2020</div>'+
   '</div>';
   if(ret) return html;
   $('cp-print').innerHTML=
@@ -1179,6 +1181,7 @@ function wireAutosave(){
 /* ---- restore saved values ---- */
 function restore(){
   if(D.deadline.last) $('dl-date').value=D.deadline.last;
+  if(window.limType && $('dl-type')){ try{ limType(true); }catch(e){} }
   for(var k in (D.complaint||{})){ if($(k)) $(k).value=D.complaint[k]; }
   for(var k2 in (D.draft||{})){ if($(k2)) $(k2).value=D.draft[k2]; }
   wireAutosave();
