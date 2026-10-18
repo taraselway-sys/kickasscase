@@ -607,7 +607,7 @@ function buildHome(){
     '<div class="dsec"><div class="dhead"><h3>What you can do here</h3></div><div class="scope">'+
       '<button type="button" class="scopecard" onclick="show(\'timeline\')"><span class="ticon">☰</span><b>Build a case file</b><span>A dated chronology, an evidence index, witnesses, letters and deadlines. Useful for any dispute.</span></button>'+
       '<button type="button" class="scopecard" onclick="show(\'court\')"><span class="ticon">▧</span><b>Go to court</b><span>Public records, open meetings, wrongful discharge and small claims.</span></button>'+
-      '<button type="button" class="scopecard" onclick="show(\'parenting\')"><span class="ticon">♡</span><b>Family court</b><span>A parenting plan and a divorce decree, drafted for district court.</span></button>'+
+      '<button type="button" class="scopecard" onclick="show(\'parenting\')"><span class="ticon">♡</span><b>Family court</b><span>A parenting plan and a divorce decree, following Montana’s official court forms.</span></button>'+
       '<button type="button" class="scopecard" onclick="show(\'complaint\')"><span class="ticon">☑</span><b>File with the Human Rights Bureau</b><span>A discrimination complaint, from intake to mediation.</span></button>'+
     '</div></div>'+
     '<div class="dsec"><div class="dhead"><h3>Your case at a glance</h3></div><div id="glance-list"></div></div>'+
