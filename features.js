@@ -726,10 +726,72 @@ function buildFurniture(){
   addMenuLink('exhibits','packet','Case packet','\u2398');
 }
 
+
+/* ================= page layout: tools first, reading folded below =================
+   Rearranges each page without changing a word: the page title gets a header,
+   the working tools come first, and reading cards fold into expandable panels. */
+var PAGE_ICONS={deadline:'◷',timeline:'☰',exhibits:'▣',witnesses:'✎',docs:'✉',records:'▤',complaint:'☑',
+  stage:'◴',rebuttal:'⇄',damages:'¤',mediation:'⚖',nocause:'⚠',ai:'⌘',care:'❦',checklist:'✓',
+  howto:'ⓘ',dates:'⧗',packet:'⎘',terms:'©',learn:'§'};
+function wordsIn(el){ return (el.textContent||'').trim().split(/\s+/).filter(Boolean).length; }
+function cardToPanel(card){
+  var h=card.querySelector(':scope > h3, :scope > h4'), title='';
+  if(h){ title=h.textContent.trim(); h.remove(); }
+  else { var b=card.querySelector('b,strong'); var bt=b? b.textContent.trim() : '';
+    title= bt && bt.length<=90 ? bt : 'Read this first'; }
+  var d=document.createElement('details'); d.className='learn fromcard';
+  var su=document.createElement('summary'); su.textContent=title; d.appendChild(su);
+  var lb=document.createElement('div'); lb.className='lb';
+  while(card.firstChild) lb.appendChild(card.firstChild);
+  d.appendChild(lb); return d;
+}
+function layoutPage(v){
+  var id=v.id.slice(2), h2=v.querySelector(':scope > h2'), sub=v.querySelector(':scope > p.sub2');
+  if(!h2 || v.dataset.laid) return; v.dataset.laid='1';
+  var head=document.createElement('div'); head.className='phead';
+  head.innerHTML='<span class="picon" aria-hidden="true">'+(PAGE_ICONS[id]||'◆')+'</span><div class="ptext"></div>';
+  v.insertBefore(head,h2); head.querySelector('.ptext').appendChild(h2); if(sub) head.querySelector('.ptext').appendChild(sub);
+  if(id==='learn') return;   // the full guide is already a list of sections
+  var kids=[].slice.call(v.children).filter(function(c){ return c!==head; });
+  var primary=[], secondary=[], intro=[], read=[], foot=[], last=null;
+  kids.forEach(function(c){
+    var isList=/(-list|-print|-sheet|-form)$/.test(c.id||'') || c.classList.contains('printout') || c.classList.contains('stages') ||
+               c.classList.contains('toolhead') || c.classList.contains('evbar') || c.classList.contains('srchwrap') || c.id==='dt-all' || c.id==='cp-outwrap' || c.id==='rq-outwrap';
+    if(c.classList.contains('pagefoot')){ foot.push(c); return; }
+    if(c.classList.contains('printout') && last){ last.push(c); return; }   // a printout stays with the tool that makes it
+    if(isList || c.tagName==='H3' || c.classList.contains('cw') || c.classList.contains('rbw') || c.querySelector('input,textarea,select')){ primary.push(c); last=primary; return; }
+    if(c.tagName==='DETAILS'){ read.push(c); last=null; return; }
+    if(c.classList.contains('card')){
+      var w=wordsIn(c), hasPri=!!c.querySelector('button.pri'), hasBtn=!!c.querySelector('button');
+      if(hasPri && w<=60){ primary.push(c); last=primary; return; }
+      if(hasPri){ secondary.push(c); last=secondary; return; }
+      if(hasBtn && w<=60){ primary.push(c); last=primary; return; }
+      if(!c.querySelector(':scope > h3, :scope > h4') && w<=60){ intro.push(c); last=null; return; }
+      read.push(cardToPanel(c)); c.remove(); last=null; return;
+    }
+    primary.push(c); last=primary;
+  });
+  // a page made only of reading keeps its first card open
+  if(!primary.length && !secondary.length && read.length && read[0].classList.contains('fromcard')) read[0].open=true;
+  var frag=document.createDocumentFragment();
+  intro.forEach(function(c){ c.classList.add('pintro'); frag.appendChild(c); });
+  primary.forEach(function(c){ frag.appendChild(c); });
+  if(secondary.length){ var sh=document.createElement('div'); sh.className='dhead pzone'; sh.innerHTML='<h3>Printable sheets</h3>';
+    if(secondary.some(function(c){ return !/print/i.test(c.textContent); })) sh.innerHTML='<h3>More tools</h3>';
+    frag.appendChild(sh); secondary.forEach(function(c){ frag.appendChild(c); }); }
+  if(read.length){ var rh=document.createElement('div'); rh.className='dhead pzone';
+    rh.innerHTML='<h3>'+(primary.length||secondary.length?'Learn more':'Read')+'</h3>'; frag.appendChild(rh);
+    var acc=document.createElement('div'); acc.className='accordion'; read.forEach(function(c){ acc.appendChild(c); }); frag.appendChild(acc); }
+  foot.forEach(function(c){ frag.appendChild(c); });
+  v.appendChild(frag);
+}
+function layoutAllPages(){ document.querySelectorAll('section.view').forEach(function(v){ if(v.id!=='v-home') layoutPage(v); }); }
+
 /* ================= start-up ================= */
 function initFeatures(){
   if(ensureIds()) save();
   buildFurniture();
+  layoutAllPages();
   // show() also refreshes the new pages
   var _show=show;
   window.show=function(id){ _show(id);

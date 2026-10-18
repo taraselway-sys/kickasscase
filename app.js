@@ -429,7 +429,7 @@ function printPage(id){
   var clone=v.cloneNode(true);
   // open every collapsed section, and drop anything interactive
   clone.querySelectorAll('details').forEach(function(d){ d.setAttribute('open',''); });
-  clone.querySelectorAll('h2, .sub2, button, input, textarea, select, .printout, .saved, .row, .srchwrap, .dash')
+  clone.querySelectorAll('h2, .sub2, button, input, textarea, select, .printout, .saved, .row, .srchwrap, .dash, .picon, .pzone')
        .forEach(function(e){ e.remove(); });
   // labels that belonged to the fields just removed, and worksheet cards left with nothing to read
   clone.querySelectorAll('label.fl, label[for]').forEach(function(e){ e.remove(); });
