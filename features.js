@@ -688,14 +688,16 @@ function addView(id,title,sub,body){
   s.innerHTML='<h2>'+title+'</h2><p class="sub2">'+sub+'</p>'+body;
   var terms=$('v-terms'); terms.parentNode.insertBefore(s,terms);
 }
-function addMenuLink(afterView,view,label,icon){
-  var drop=$('drop'), btns=drop.querySelectorAll('.dlink'), ref=null;
-  for(var i=0;i<btns.length;i++){ if((btns[i].getAttribute('onclick')||'').indexOf("show('"+afterView+"')")>-1) ref=btns[i]; }
+function addMenuLink(afterView,view,label,icon,moreAfter){
+  var after=function(root,sel,v){ var bs=root.querySelectorAll(sel), r=null;
+    for(var i=0;i<bs.length;i++){ if((bs[i].getAttribute('onclick')||'').indexOf("show('"+v+"')")>-1) r=bs[i]; } return r; };
+  var drop=$('drop'), ref=after(drop,'.dlink',afterView);
   var b=document.createElement('button'); b.className='dlink'; b.textContent=label; b.setAttribute('onclick',"show('"+view+"')");
   if(ref) ref.parentNode.insertBefore(b,ref.nextSibling);
-  var ms=$('moresheet'), close=ms.querySelector('.moreclose');
+  var ms=$('moresheet'), close=ms.querySelector('.moreclose'), mref=after(ms,'.morelink',moreAfter||afterView);
   var m=document.createElement('button'); m.className='morelink'; m.setAttribute('onclick',"show('"+view+"')");
-  m.innerHTML='<span class="mi">'+icon+'</span>'+label; ms.insertBefore(m,close);
+  m.innerHTML='<span class="mi">'+icon+'</span>'+label;
+  if(mref) mref.parentNode.insertBefore(m,mref.nextSibling); else ms.insertBefore(m,close);
 }
 function buildFurniture(){
   // chronology: links and tags under the form, view switch above the list
@@ -731,8 +733,8 @@ function buildFurniture(){
     '<div class="row"><button class="pri" onclick="buildPacket()">Build the case packet</button></div></div>'+
     '<div id="pk-print" class="printout" style="display:none"></div>');
   buildHome();
-  addMenuLink('deadline','dates','Your deadlines','\u29d7');
-  addMenuLink('exhibits','packet','Case packet','\u2398');
+  addMenuLink('deadline','dates','Your deadlines','\u29d7','docs');
+  addMenuLink('court','packet','Case packet','\u2398');
 }
 
 
