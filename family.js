@@ -14,7 +14,7 @@ var FAM_PACKET={
     ['MP-203 Response to a parenting plan petition','https://courts.mt.gov/external/forms/dissolution/MP-203.docx'],
     ['MP-300 Proposed Parenting Plan','https://courts.mt.gov/external/forms/dissolution/MP-300.doc'],
     ['MP-300 instructional cheat sheet','https://courts.mt.gov/external/forms/dissolution/MP300cheatsheet.pdf'],
-    ['MP-300-G Medical support order','https://courts.mt.gov/external/forms/dissolution/MP-300-G.docx'],
+    ['MP-300-G Description of existing medical coverage','https://courts.mt.gov/external/forms/dissolution/MP-300-G.docx'],
     ['MP-414 Summons','https://courts.mt.gov/forms/ParentPlan/MP-414.pdf'],
     ['MP-721 Request for hearing on a parenting plan','https://courts.mt.gov/external/forms/dissolution/MP-721.docx'],
     ['MP-722 Order granting a hearing on a parenting plan','https://courts.mt.gov/external/forms/dissolution/MP-722.docx'],
@@ -23,7 +23,7 @@ var FAM_PACKET={
     ['MP-320 Joint parenting plan (filing together)','https://courts.mt.gov/forms/Dissolution-docs/MP-320-Joint-Parenting-Plan-8.10.2026.pdf'],
     ['Montana Child Support Guidelines','https://dphhs.mt.gov/cssd/services/guidelines'],
     ['Child support guidelines tables','https://dphhs.mt.gov/assets/cssd/PolicyManual/cs404-2.pdf'],
-    ['Online child support calculator','https://www.montanalawhelp.org/resource/montana-online-child-support-calculator']
+    ['Online child support calculator (MontanaLawHelp says it is not working right now)','https://www.montanalawhelp.org/resource/montana-online-child-support-calculator']
   ],
   dd:[
     ['Complete packet: divorce with children (PDF)','https://courts.mt.gov/external/forms/dissolution/dissolution-child-packet.pdf'],
@@ -209,9 +209,9 @@ function renderParenting(){
   h+=famForms('pp','This page follows the court’s Proposed Parenting Plan, form MP-300, section by section, in the same order and with the same choices. Use it to fill in the official form, or print the draft and compare it line by line. The complete packet has every form you need to start a parenting case, and instructions.');
   h+=famBefore([
     ['Who can file','Either parent, or both together. Montana can usually decide only if Montana is the children’s home state: they lived here for the 6 months before the case was filed, or since birth if they are younger. Section 40-7-201, MCA.'],
-    ['What the court decides by','The children’s best interests. The court weighs the factors in § 40-4-212, MCA, including frequent and continuing contact with both parents, unless that contact is not in the children’s best interests.'],
-    ['What a plan must cover','Section 40-4-234, MCA lists what a final parenting plan includes: where the children live and when, holidays and vacations, decision-making, transportation, and how you settle disagreements.'],
-    ['After you file','The other parent has 21 days after being served to file a response. The court may order mediation, but not when there is reason to suspect domestic violence or abuse.'],
+    ['What the court decides by','The children’s best interests. The court weighs the factors in § 40-4-212, MCA, including frequent and continuing contact with both parents, unless a hearing shows that contact would harm the children.'],
+    ['What a plan must cover','Section 40-4-234, MCA lists what a final parenting plan includes: where the children live and when, holidays and vacations, decision-making, and how you settle disagreements.'],
+    ['After you file','The other parent has 21 days after being served to file a response. The court may order mediation, but not when there is reason to suspect domestic violence or abuse, unless both parents agree to it in writing.'],
     ['Child support','Support is set by the Montana Child Support Guidelines. The forms call the state agency the Child Support Enforcement Division (CSED). It is now named the Child Support Services Division (CSSD).'],
     ['Children’s privacy','The form uses each child’s initials, not their full name.']]);
   h+=famYou(P);
@@ -305,7 +305,7 @@ function renderParenting(){
     fA(P,'soleWhy','This is in our children’s best interest because'));
   dm+=fT(P,'dmOther','Other (specify)')+'<p class="fl">Both parents must consent before a child may (check all that apply)</p>'+fC(P,'coTat','Get a tattoo')+fC(P,'coPie','Pierce any body part')+fC(P,'coMar','Marry')+fC(P,'coEnl','Enlist in the armed services')+fT(P,'coOth','Other');
   h+=famCard('11. Decision Making',dm);
-  h+=famCard('12. Access to Information',fNote('Printed on the form: both parents have access to all records about the children (§ 40-4-225, MCA), and both must give each other and the Court written notice of changes to addresses, phone numbers, employers and health insurance (§ 40-4-204(6)(a), MCA).')+
+  h+=famCard('12. Access to Information',fNote('Printed on the form: both parents have access to all records about the children (§ 40-4-225, MCA), and the form says both will give each other and the Court written notice of changes to addresses, phone numbers, employers and health insurance. Section 40-4-204(6)(a), MCA requires those updates to be filed with the Court.')+
     fC(P,'conf','One parent’s personal information should stay confidential',1)+(s.conf?fSub(fPS(P,'confWho','Whose information')+fA(P,'confWhy','Because')):''));
   h+=famCard('13. Residential Changes',fNote('Printed on the form, from § 40-4-217, MCA: a parent who plans to move must give written notice. If the move will significantly affect the children’s contact with the other parent, the moving parent files a motion and a proposed revised schedule, served at least 30 days before the move. The other parent has 21 days to respond, or the new schedule may be ordered without more hearings. Nothing to fill in. Form MP-904 is the notice.'));
   h+=famCard('14. Review of Parenting Plan (choose one)',fR(P,'rev','The parents will review and amend this plan',[['times','at set times'],['change','only if there is a change in the children’s circumstances']])+(s.rev==='times'?fSub(fT(P,'revTxt','When','Before each child starts kindergarten and again before middle school')):''));
@@ -324,7 +324,7 @@ function renderParenting(){
     (s.csCalc==='will'?fPS(P,'csOpener','Who will open the CSED case')+fNote('The form warns that some courts do not allow this option.'):'')+(s.csCalc==='other'?fA(P,'csCalcTxt','Describe'):''));
   cs+=fR(P,'csPay','c. Child Support Payments (choose one)',[['csed','Paid to CSED on or before the first of every month'],['iw','Paid by immediate income withholding'],['direct','Paid directly to the other parent'],['clerk','Paid to the Clerk of District Court on or before the first of each month']]);
   if(s.csPay&&s.csPay!=='iw') cs+=fSub(fPS(P,'csPayWho','Who makes the payments')+(s.csPay==='direct'?fT(P,'csDay','Day of each month','1st')+fC(P,'csExempt','The order is exempt from immediate income withholding',1)+(s.csExempt?fA(P,'csExemptWhy','Because'):''):'')+
-    (s.csPay==='csed'?fNote('Payments must go through CSED if a party receives TANF or Family Medicaid, or there is an active CSED case. Section 40-5-909, MCA.'):''));
+    (s.csPay==='csed'?fNote('The form says payments must go through CSED if a party receives TANF or Family Medicaid, or there is an active CSED case. Section 40-5-909, MCA.'):''));
   if(s.csPay==='iw') cs+=fSub(fPS(P,'csIwWho','Whose income is subject to immediate income withholding'));
   cs+=fR(P,'csEnd','d. Child Support Termination (choose one)',[['std','When each child turns 18 or graduates from high school, whichever is later, but no later than age 19'],['dis','Support continues for a child who is disabled past the age of majority']]);
   if(s.csEnd==='dis') cs+=fSub(fPS(P,'csDisWho','Who agrees to keep paying')+fT(P,'csDisKid','The child’s initials')+fT(P,'csDisUntil','Paid until (month and year)'));
@@ -502,10 +502,10 @@ function renderDecree(){
   h+=famForms('dd','This page follows the court’s decree forms in the same order and with the same choices: MP-703 when you have minor children together, and MP-713 when you do not. The Property Distribution at the bottom follows form MP-500, sections 1 to 10. If you file together, the joint packets use MP-721 or MP-722, which cover the same findings. The complete packets list every form you need, in order, with instructions.');
   h+=famBefore([
     ['Who can file','One spouse must have lived in Montana, or been stationed here in the military, for 90 days before filing. Section 40-4-104, MCA.'],
-    ['What the court must find','That the marriage is irretrievably broken: you have lived apart for more than 180 days, or there is serious marital discord that hurts how one or both of you feel about the marriage. Section 40-4-107, MCA.'],
+    ['What the court must find','That the marriage is irretrievably broken: you have lived apart for more than 180 days, or there is serious marital discord that hurts how one or both of you feel about the marriage. Section 40-4-104, MCA.'],
     ['Children','With minor children, the decree adopts a final parenting plan and sets child support. Draft the plan on the Parenting plan page.'],
     ['After you file','Your spouse has 21 days after being served to file a response. Both spouses must exchange financial disclosures of assets, debts, income and expenses. Sections 40-4-252 to 40-4-254, MCA.'],
-    ['The economic restraining order','When a divorce is filed, the summons includes an order that keeps both spouses from hiding, selling or giving away property while the case is open. Section 40-4-121(3), MCA. The decree ends it.'],
+    ['The economic restraining order','When a divorce is filed, the summons includes an automatic economic restraining order. It keeps both spouses from hiding, selling or giving away property while the case is open. It binds the petitioner on filing and the respondent once served. Section 40-4-126, MCA. The decree ends it.'],
     ['Privacy','For bank accounts, list only the last four digits.']]);
   h+=famYou(P);
   h+=famCard('Which decree form',fR(P,'kids','Do you have minor children together?',[['yes','Yes: Dissolution Decree With Minor Children (MP-703)'],['no','No: Final Dissolution Decree, No Minor Children (MP-713)']])+
@@ -562,7 +562,7 @@ function renderDecree(){
   if(s.maintF==='denied') f+=fSub(fA(P,'maintWhy','Because'));
   f+=fA(P,'addF','Additional findings (optional)');
   h+=famCard('Findings of fact and conclusions of law',f);
-  var dc=fNote('Printed on the form: '+(kids?'':'the Court has jurisdiction; ')+'the marriage is dissolved, and the Temporary Economic Restraining Order is dissolved.');
+  var dc=fNote('Printed on the form: '+(kids?'':'the Court has jurisdiction; ')+'the marriage is dissolved, and the Automatic Economic Restraining Order is dissolved.');
   if(kids) dc+=fT(P,'ppEx','Exhibit letter for the Parenting Plan','A')+fT(P,'pdEx','Exhibit letter for the Property Distribution','B')+fD(P,'doneBy','All actions (titles, deeds, documents) completed no later than');
   else dc+=fT(P,'doneDays','Days to complete all actions (titles, deeds, documents)','30');
   dc+=fR(P,'n1','Name: '+L1,[['remain','Remains the same'],['restore','Is restored to a former name']])+(s.n1==='restore'?fSub(fT(P,'n1Name','First, middle and last name')):'')+
@@ -666,7 +666,7 @@ function ddText(){
   para('MARRIAGE',[{lic:'The parties were married on '+nd(s.marDate)+'. The marriage license was filed in '+fb(s.marCounty)+' County, State of '+fb(s.marState)+'.',
     cl:'The parties were married at common law as of '+nd(s.marDate)+'. The parties assumed a marital relationship by mutual consent and agreement. The parties confirmed their marriage by living together and by public knowledge.',
     decl:'The parties filed a declaration of marriage on '+nd(s.marDate)+' in '+fb(s.marCounty)+' County, State of '+fb(s.marState)+'.'}[s.mar]||'__________']);
-  var apart=kids?'The parties lived separate and apart for at least 180 days before this case was filed.':'The parties lived separate and apart for more than 180 days before this case was filed.';
+  var apart=kids?'The parties lived separate and apart for more than 180 days before this case was filed.':'The parties lived separate and apart for more than 180 days before this case was filed.';
   var disc='There is serious marital discord that adversely affects the attitude of one or both of the parties toward the marriage and there is no reasonable prospect of reconciliation.';
   if(kids) para('IRRETRIEVABLE BREAKDOWN',['The marriage of the parties is irretrievably broken.',(s.brk==='apart'||s.brk==='both')?apart:'',(s.brk==='discord'||s.brk==='both')?disc:'',s.concil?'The Montana Conciliation Law (beginning at §40-3-101, M.C.A.) does not apply in this case.':'',s.brk?'':'__________']);
   else { para('IRRETRIEVABLE BREAKDOWN',['The marriage of the parties is irretrievably broken in that: '+(s.brk==='apart'?apart:s.brk==='discord'?disc:'__________')]);
@@ -700,14 +700,14 @@ function ddText(){
       'Spousal Maintenance: '+(s.mPayer?L(s.mPayer):'__________')+' shall pay '+(fbs(s.mAmt)?money(s.mAmt):'$__________')+' per month commencing on '+nd(s.mStart)+' until '+nd(s.mEnd)+' (date of last payment) in spousal support. The payment must be made on the '+fb(s.mDay)+' of each month directly to '+to+'.'; };
   if(kids){
     dp('The Court dissolves the marriage between '+(joint?'Co-Petitioner 1 and Co-Petitioner 2':'Petitioner and Respondent')+'.');
-    dp('The court dissolves the Temporary Economic Restraining Order issued in this matter under M.C.A. § 40-4-121(3).');
+    dp('The court dissolves the Automatic Economic Restraining Order issued in this matter under M.C.A. § 40-4-126.');
     dp('The Court has signed and adopts the Parenting Plan identified as Exhibit '+fb(s.ppEx)+'. The Court orders the parties to follow this Parenting Plan.');
     dp('The Court has signed and adopts the Property Distribution identified as Exhibit '+fb(s.pdEx)+'. The Court orders the parties to follow this Property Distribution.');
     dp('Each party is ordered to take any action necessary to carry out the terms and conditions of this decree including the signing or transfer of titles, deeds, or other documents. All necessary actions must be completed no later than: '+nd(s.doneBy)+'.');
   } else {
     dp('The Court has jurisdiction over the parties and this cause of action.');
     dp('The Court dissolves the marriage between the parties.');
-    dp('If applicable, the Court dissolves the Temporary Economic Restraining Order issued in this matter under M.C.A. § 40-4-121(3).');
+    dp('If applicable, the Court dissolves the Automatic Economic Restraining Order issued in this matter under M.C.A. § 40-4-126.');
     dp('The following property distribution is a fair and equitable apportionment between the parties of the marital property, assets, and liabilities and is not unconscionable: '+plan(s.pdAdopt,'Property Distribution',s.pdMod)+'.');
     dp('The Court has signed and adopts and incorporates by reference the approved Property Distribution. The Court orders the parties to follow the Property Distribution.');
     dp('Each party is ordered to take any action necessary to carry out the terms and conditions of this Decree including the signing and transfer of titles, deeds, or other documents within '+fb(s.doneDays)+' days from the date of this Decree or as more specifically provided in the Property Distribution.');
