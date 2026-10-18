@@ -586,3 +586,11 @@ button.scopecard:hover{border-color:var(--blue);box-shadow:0 3px 14px rgba(22,48
 button.scopecard b{font-size:15.5px;color:var(--navy)}
 button.scopecard span:last-child{font-size:13px;color:var(--mut);line-height:1.4}
 button.scopecard .ticon{margin-bottom:2px}
+
+/* ===== complaint page: which route this is ===== */
+.card.scopenote{background:#fbf6e6;border:1px solid #ecdcae;border-left:4px solid var(--gold)}
+.scopenote p{margin:0 0 8px;font-size:14.5px;line-height:1.5}
+.scopenote .snl{font-size:16px;color:var(--navy)}
+.scopenote .snq{font-weight:700;color:var(--navy);margin-top:10px}
+.scopenote .snlinks{display:flex;flex-wrap:wrap;gap:7px}
+.scopenote .snlinks button.lchip{font-size:13px;padding:6px 11px}

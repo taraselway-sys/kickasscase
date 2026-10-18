@@ -703,6 +703,15 @@ function buildFurniture(){
   // chronology: links and tags under the form, view switch above the list
   var doc=$('ev-doc'); if(doc) injectAfter(doc,'<div id="evlinks-list" class="evlinks"></div>');
   var evl=$('ev-list'); if(evl){ var bar=document.createElement('div'); bar.id='evbar-list'; bar.className='evbar'; evl.parentNode.insertBefore(bar,evl); }
+  // complaint: say plainly this page is the Bureau route, and point to the others
+  var cth=document.querySelector('#v-complaint .toolhead');
+  if(cth){ var sn=document.createElement('div'); sn.className='card ctool scopenote';
+    sn.innerHTML='<p class="snl"><b>This page is for a discrimination complaint to the Montana Human Rights Bureau.</b></p>'+
+      '<p>The Bureau handles unfair treatment because of a protected ground, such as sex, race, age, disability or religion, and retaliation for complaining about it.</p>'+
+      '<p class="snq">Something else? Court filings drafts these:</p><div class="snlinks">'+
+      [['records','Public records'],['meetings','Open meeting'],['wdea','Wrongful discharge'],['small','Small claims']].map(function(x){
+        return '<button type="button" class="lchip" onclick="show(\'court\');ctPick(\''+x[0]+'\')">'+x[1]+' \u2192</button>'; }).join('')+'</div>';
+    cth.parentNode.insertBefore(sn,cth); }
   // complaint: claim wizard before the form, length meter under the particulars
   var tool=document.querySelector('#v-complaint .toolhead');
   if(tool) injectAfter(tool,'<div class="card cw"><h3 style="margin-top:0">Work out what you are claiming</h3>'+
