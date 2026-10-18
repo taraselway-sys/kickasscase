@@ -602,6 +602,7 @@ function buildHome(){
   var logo=home.querySelector('.homelogo'), tip=$('iostip');
   var dash=document.createElement('div'); dash.id='dash-list'; dash.className='dash';
   dash.innerHTML='<div class="hero"><div class="herotop"></div><div id="nextstep-list"></div></div>'+
+    '<div id="install-list"></div>'+
     '<div class="dsec"><div class="dhead"><h3>What you can do here</h3></div><div class="scope">'+
       '<button type="button" class="scopecard" onclick="show(\'timeline\')"><span class="ticon">☰</span><b>Build a case file</b><span>A dated chronology, an evidence index, witnesses, letters and deadlines. Useful for any dispute.</span></button>'+
       '<button type="button" class="scopecard" onclick="show(\'court\')"><span class="ticon">▧</span><b>Go to court</b><span>Public records, open meetings, wrongful discharge and small claims.</span></button>'+
@@ -663,7 +664,53 @@ function renderHome(){
   $('savedwork-list').innerHTML='<div class="saved-strip"><div class="sw-t"><b>Your saved work</b><span>'+
     (lb? 'Last backup '+(bd===0?'today':dayWord(bd)+' ago') : 'Not backed up yet')+' · stored only on this device</span></div>'+
     '<div class="sw-b"><button class="pri" onclick="exportAll()">Back up</button><button class="sec" onclick="document.getElementById(\'imp\').click()">Restore</button></div></div>';
-  renderHomeDates();
+  renderHomeDates(); renderInstall();
+}
+
+
+/* ================= install on a phone ================= */
+var INSTALL_EVT=null;
+window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); INSTALL_EVT=e; renderInstall(); });
+window.addEventListener('appinstalled',function(){ INSTALL_EVT=null; try{ localStorage.setItem('kc_installed','1'); }catch(e){} renderInstall(); });
+function isInstalled(){
+  try{ if(window.navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches)) return true; }catch(e){}
+  return false;
+}
+function renderInstall(){
+  var box=$('install-list'); if(!box) return;
+  if(isInstalled() || !/^https?:$/.test(location.protocol)){ box.innerHTML=''; return; }
+  var ios=isIOS();
+  box.innerHTML='<div class="installcard"><span class="ticon">📱</span><div class="it"><b>Put it on your phone</b>'+
+    '<span>Add the Case Builder to your Home Screen. It opens like an app, works without a connection'+
+    (ios?', and Safari stops clearing your saved work.':'.')+'</span></div>'+
+    '<button class="pri" onclick="installApp()">Install the app</button></div>';
+  var tip=$('iostip'); if(tip) tip.className='';   // this card replaces the older tip
+}
+function shareIcon(){ return '<svg class="shico" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10H5v10h14V10h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>'; }
+function installApp(){
+  if(INSTALL_EVT){
+    var e=INSTALL_EVT; INSTALL_EVT=null; e.prompt();
+    (e.userChoice||Promise.resolve()).then(function(){ renderInstall(); });
+    return;
+  }
+  var ios=isIOS(), html;
+  if(ios){
+    html='<h3>Add it to your Home Screen</h3><ol class="isteps">'+
+      '<li>Tap the <b>Share</b> button '+shareIcon()+'. In Safari it is at the bottom of the screen, or at the top on an iPad.</li>'+
+      '<li>Scroll down and tap <b>Add to Home Screen</b>.</li>'+
+      '<li>Tap <b>Add</b>. The Case Builder appears on your Home Screen with its own icon.</li></ol>'+
+      '<p class="note">Open it from the Home Screen from now on. The Home Screen app keeps its own saved work, apart from Safari. If you have already entered work in Safari, back it up there first, then restore it in the app.</p>';
+  } else if(/Android/i.test(navigator.userAgent)){
+    html='<h3>Add it to your Home Screen</h3><ol class="isteps">'+
+      '<li>Open this page in <b>Chrome</b>.</li><li>Tap the <b>⋮</b> menu at the top right.</li>'+
+      '<li>Tap <b>Install app</b> or <b>Add to Home screen</b>, then <b>Install</b>.</li></ol>';
+  } else {
+    html='<h3>Install it on this computer</h3><ol class="isteps">'+
+      '<li>In <b>Chrome</b> or <b>Edge</b>, click the install icon at the right of the address bar, then <b>Install</b>.</li>'+
+      '<li>In <b>Safari</b> on a Mac, choose <b>File</b>, then <b>Add to Dock</b>.</li></ol>'+
+      '<p class="note">On a phone, open kickasscase.netlify.app and tap Install the app there.</p>';
+  }
+  dlgOpen(html+'<div class="row"><button class="pri" onclick="dlgClose()">Done</button></div>');
 }
 
 /* ================= search your own entries ================= */
@@ -810,6 +857,7 @@ function layoutAllPages(){ document.querySelectorAll('section.view').forEach(fun
 /* ================= start-up ================= */
 function initFeatures(){
   if(ensureIds()) save();
+  window.iosTip=function(){ renderInstall(); };   // the install card replaces the older tip
   if(window.initCourt) initCourt();
   buildFurniture();
   layoutAllPages();

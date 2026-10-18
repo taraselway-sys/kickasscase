@@ -594,3 +594,14 @@ button.scopecard .ticon{margin-bottom:2px}
 .scopenote .snq{font-weight:700;color:var(--navy);margin-top:10px}
 .scopenote .snlinks{display:flex;flex-wrap:wrap;gap:7px}
 .scopenote .snlinks button.lchip{font-size:13px;padding:6px 11px}
+
+/* ===== install on a phone ===== */
+.installcard{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-left:4px solid #f2b705;border-radius:13px;padding:13px 14px;margin:0 0 16px}
+.installcard .it{flex:1;min-width:200px}
+.installcard .it b{display:block;font-size:15.5px;color:var(--navy)}
+.installcard .it span{font-size:13.5px;color:var(--mut);line-height:1.45}
+.installcard button{flex:0 0 auto}
+@media (max-width:480px){ .installcard button{width:100%} }
+ol.isteps{margin:6px 0 10px;padding-left:22px}
+ol.isteps li{margin:0 0 10px;font-size:15px;line-height:1.5}
+svg.shico{vertical-align:-4px;color:#0a84ff}
