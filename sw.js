@@ -3,8 +3,8 @@
    Every file is fetched fresh whenever the network is there, so updates arrive
    on the next visit; the stored copy is used only when offline.
    It never touches the user's case data, which lives in IndexedDB on the device. */
-var CACHE = 'kickasscase-v2';
-var SHELL = ['/', '/app.css', '/app.js', '/features.js', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/icon-180.png'];
+var CACHE = 'kickasscase-__V__';
+var SHELL = ['/', '/app.css?v=__V__', '/app.js?v=__V__', '/features.js?v=__V__', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/icon-180.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));

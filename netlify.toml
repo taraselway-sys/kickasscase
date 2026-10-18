@@ -1,6 +1,9 @@
-# Kickass Case Builder — static site, no build step.
+# Kickass Case Builder — static site. The only build step stamps the version on file links.
 [build]
   publish = "."
+  # Stamp each deploy's version into the file links, so browsers always load
+  # the new styles and scripts together with the new page.
+  command = "V=$(echo ${COMMIT_REF:-local} | cut -c1-8); sed -i \"s/__V__/$V/g\" index.html sw.js"
 
 # Old file name from the first upload keeps working.
 [[redirects]]
