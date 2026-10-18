@@ -584,8 +584,9 @@ function buildPacket(){
 
 /* ================= home dashboard ================= */
 var HOME_TOOLS=[
- ['Build your case',[['complaint','☑'],['deadline','◷'],['timeline','☰'],['exhibits','▣'],['witnesses','✎'],['docs','✉'],['records','▤'],['dates','⧗']]],
- ['Asking and arguing',[['rebuttal','⇄'],['damages','¤'],['mediation','⚖'],['nocause','⚠'],['packet','⎘']]],
+ ['Build your case file',[['timeline','☰'],['exhibits','▣'],['witnesses','✎'],['docs','✉'],['records','▤'],['dates','⧗'],['packet','⎘']]],
+ ['Court filings, outside the Bureau',[['ct:records'],['ct:meetings'],['ct:wdea'],['ct:small'],['ct:hrb']]],
+ ['A discrimination complaint with the Human Rights Bureau',[['complaint','☑'],['deadline','◷'],['stage','◴'],['rebuttal','⇄'],['damages','¤'],['mediation','⚖'],['nocause','⚠']]],
  ['Support',[['ai','⌘'],['care','❦'],['checklist','✓'],['howto','ⓘ']]]];
 function viewInfo(v){
   var sec=$('v-'+v); if(!sec) return {t:v,d:''};
@@ -601,6 +602,11 @@ function buildHome(){
   var logo=home.querySelector('.homelogo'), tip=$('iostip');
   var dash=document.createElement('div'); dash.id='dash-list'; dash.className='dash';
   dash.innerHTML='<div class="hero"><div class="herotop"></div><div id="nextstep-list"></div></div>'+
+    '<div class="dsec"><div class="dhead"><h3>What you can do here</h3></div><div class="scope">'+
+      '<button type="button" class="scopecard" onclick="show(\'timeline\')"><span class="ticon">☰</span><b>Build a case file</b><span>A dated chronology, an evidence index, witnesses, letters and deadlines. Useful for any dispute.</span></button>'+
+      '<button type="button" class="scopecard" onclick="show(\'court\')"><span class="ticon">▧</span><b>Go to court</b><span>Public records, open meetings, wrongful discharge and small claims.</span></button>'+
+      '<button type="button" class="scopecard" onclick="show(\'complaint\')"><span class="ticon">☑</span><b>File with the Human Rights Bureau</b><span>A discrimination complaint, from intake to mediation.</span></button>'+
+    '</div></div>'+
     '<div class="dsec"><div class="dhead"><h3>Your case at a glance</h3></div><div id="glance-list"></div></div>'+
     '<div id="homedates-list"></div>'+
     '<div class="dsec"><div class="dhead"><h3>Your tools</h3></div><div id="tools-list"></div></div>'+
@@ -611,7 +617,10 @@ function buildHome(){
   if(logo) dash.querySelector('.herotop').appendChild(logo);
   // tools never change, so draw them once
   $('tools-list').innerHTML=HOME_TOOLS.map(function(g){
-    return '<div class="tgroup"><div class="lhead">'+g[0]+'</div><div class="tgrid">'+g[1].map(function(t){ var i=viewInfo(t[0]);
+    return '<div class="tgroup"><div class="lhead">'+g[0]+'</div><div class="tgrid">'+g[1].map(function(t){
+      if(t[0].indexOf('ct:')===0){ var k=t[0].slice(3), C=window.CT_TYPES&&CT_TYPES[k]; if(!C) return '';
+        return '<button type="button" class="tool" onclick="show(\'court\');ctPick(\''+k+'\')"><span class="ticon">'+C.icon+'</span><span class="ttext"><b>'+esc(C.name)+'</b><span>'+esc(C.blurb)+'</span></span></button>'; }
+      var i=viewInfo(t[0]);
       return '<button type="button" class="tool" onclick="show(\''+t[0]+'\')"><span class="ticon">'+t[1]+'</span><span class="ttext"><b>'+esc(i.t)+'</b><span>'+esc(i.d)+'</span></span></button>';
     }).join('')+'</div></div>';
   }).join('');
@@ -635,7 +644,7 @@ function renderHome(){
   var last=D.deadline&&D.deadline.last, left=null, due='';
   if(last){ due=addDays(last,180); left=daysBetween(todayISO(),due); }
   var dl= last? (left<0? '<b class="bad">Passed</b><span>180 days ended '+esc(niceDate(due))+'</span>'
-      : '<b class="'+(left<=30?'warn':'')+'">'+left+'</b><span>days left to file · '+esc(niceDate(due))+'</span>')
+      : '<b class="'+(left<=30?'warn':'')+'">'+left+'</b><span>days left to file with the Bureau · '+esc(niceDate(due))+'</span>')
       : '<b class="mut">—</b><span>Set your deadline</span>';
   var tile=function(view,inner,cls){ return '<button type="button" class="gtile'+(cls?' '+cls:'')+'" onclick="show(\''+view+'\')">'+inner+'</button>'; };
   var cnt=function(n,w,empty){ return n? '<b>'+n+'</b><span>'+w+'</span>' : '<b class="mut">0</b><span>'+empty+'</span>'; };
@@ -732,7 +741,7 @@ function buildFurniture(){
    the working tools come first, and reading cards fold into expandable panels. */
 var PAGE_ICONS={deadline:'◷',timeline:'☰',exhibits:'▣',witnesses:'✎',docs:'✉',records:'▤',complaint:'☑',
   stage:'◴',rebuttal:'⇄',damages:'¤',mediation:'⚖',nocause:'⚠',ai:'⌘',care:'❦',checklist:'✓',
-  howto:'ⓘ',dates:'⧗',packet:'⎘',terms:'©',learn:'§'};
+  howto:'ⓘ',court:'▧',dates:'⧗',packet:'⎘',terms:'©',learn:'§'};
 function wordsIn(el){ return (el.textContent||'').trim().split(/\s+/).filter(Boolean).length; }
 function cardToPanel(card){
   var h=card.querySelector(':scope > h3, :scope > h4'), title='';
@@ -759,7 +768,7 @@ function layoutPage(v){
                c.classList.contains('toolhead') || c.classList.contains('evbar') || c.classList.contains('srchwrap') || c.id==='dt-all' || c.id==='cp-outwrap' || c.id==='rq-outwrap';
     if(c.classList.contains('pagefoot')){ foot.push(c); return; }
     if(c.classList.contains('printout') && last){ last.push(c); return; }   // a printout stays with the tool that makes it
-    if(isList || c.tagName==='H3' || c.classList.contains('cw') || c.classList.contains('rbw') || c.querySelector('input,textarea,select')){ primary.push(c); last=primary; return; }
+    if(isList || c.tagName==='H3' || c.classList.contains('cw') || c.classList.contains('rbw') || c.classList.contains('ctool') || c.querySelector('input,textarea,select')){ primary.push(c); last=primary; return; }
     if(c.tagName==='DETAILS'){ read.push(c); last=null; return; }
     if(c.classList.contains('card')){
       var w=wordsIn(c), hasPri=!!c.querySelector('button.pri'), hasBtn=!!c.querySelector('button');
@@ -790,6 +799,7 @@ function layoutAllPages(){ document.querySelectorAll('section.view').forEach(fun
 /* ================= start-up ================= */
 function initFeatures(){
   if(ensureIds()) save();
+  if(window.initCourt) initCourt();
   buildFurniture();
   layoutAllPages();
   // show() also refreshes the new pages
