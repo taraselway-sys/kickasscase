@@ -1186,7 +1186,14 @@ function restore(){
 
 /* ---- start-up: open IndexedDB, take the newest copy of the work, then draw the app ---- */
 var booted=false;
-function boot(){ if(booted) return; booted=true; if(window.initFeatures) initFeatures(); addSearch(); show('home'); restore(); iosTip(); keepStorage(); checkBackup(); registerSW(); }
+function boot(){ if(booted) return; booted=true;
+  if(!window.initFeatures || !window.renderEvents){
+    // a script did not arrive (a dropped connection, or an old copy): say so instead of failing quietly
+    var n=document.getElementById('notice');
+    if(n){ n.className='on warn'; n.innerHTML='<p><b>Part of the Case Builder did not load.</b> Your saved work is safe. Check your connection and reload the page.</p><div class="row"><button class="pri" onclick="location.reload()">Reload</button></div>'; }
+    return;
+  }
+  initFeatures(); addSearch(); show('home'); restore(); iosTip(); keepStorage(); checkBackup(); registerSW(); }
 function registerSW(){
   try{ if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(function(){}); }catch(e){}
 }
