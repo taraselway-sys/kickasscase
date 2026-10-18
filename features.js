@@ -587,12 +587,17 @@ function buildPacket(){
 
 
 /* ================= home dashboard ================= */
+var HOME_PATHS=[
+ ['casefile','Build a case file','A dated chronology, an evidence index, witnesses, letters and deadlines. Useful for any dispute.','folder-open'],
+ ['court','Go to court','Public records, open meetings, discrimination after the Bureau, wrongful discharge and small claims.','landmark'],
+ ['family','Family court','A parenting plan and a divorce decree, following Montana\u2019s official court forms.','heart-handshake'],
+ ['bureau','File with the Human Rights Bureau','A discrimination complaint, from intake to mediation.','scale']];
 var HOME_TOOLS=[
- ['Build your case file',[['timeline','☰'],['exhibits','▣'],['witnesses','✎'],['docs','✉'],['records','▤'],['deadline','◷'],['dates','⧗'],['packet','⎘']]],
- ['Court filings, outside the Bureau',[['ct:records'],['ct:meetings'],['ct:wdea'],['ct:small'],['ct:hrb']]],
- ['Family court',[['parenting','♡'],['decree','⧉']]],
- ['A discrimination complaint with the Human Rights Bureau',[['complaint','☑'],['stage','◴'],['rebuttal','⇄'],['damages','¤'],['mediation','⚖'],['nocause','⚠']]],
- ['Support',[['ai','⌘'],['care','❦'],['checklist','✓'],['howto','ⓘ']]]];
+ ['casefile','Build your case file',['timeline','exhibits','witnesses','docs','records','deadline','dates','packet']],
+ ['court','Court filings, outside the Bureau',['ct:records','ct:meetings','ct:wdea','ct:small','ct:hrb']],
+ ['family','Family court',['parenting','decree']],
+ ['bureau','A discrimination complaint with the Human Rights Bureau',['complaint','stage','rebuttal','damages','mediation','nocause']],
+ ['support','Support',['ai','care','checklist','howto']]];
 function viewInfo(v){
   var sec=$('v-'+v); if(!sec) return {t:v,d:''};
   var h=sec.querySelector('h2'), sb=sec.querySelector('.sub2');
@@ -602,35 +607,57 @@ function viewInfo(v){
   var first=(txt.match(/^.*?[.!?](\s|$)/)||[txt])[0].trim();
   return {t:h?h.textContent.trim():v, d:first};
 }
+function homeTab(){ try{ return localStorage.getItem('kc_hometab')||'casefile'; }catch(e){ return 'casefile'; } }
+function setHomeTab(k,scroll){
+  try{ localStorage.setItem('kc_hometab',k); }catch(e){}
+  document.querySelectorAll('.htab').forEach(function(b){ var on=b.getAttribute('data-k')===k; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); });
+  document.querySelectorAll('.tgroup').forEach(function(g){ g.style.display= g.getAttribute('data-k')===k?'':'none'; });
+  if(scroll){ var t=$('tools-anchor'); if(t){ try{ t.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){ t.scrollIntoView(); } } }
+}
+function pickPath(k){ setHomeTab(k,true); }
+function toolButton(v){
+  if(v.indexOf('ct:')===0){ var k=v.slice(3), C=window.CT_TYPES&&CT_TYPES[k]; if(!C) return '';
+    return '<button type="button" class="tool" onclick="show(\'court\');ctPick(\''+k+'\')"><span class="ticon">'+vico(v)+'</span><span class="ttext"><b>'+esc(C.name)+'</b><span>'+esc(C.blurb)+'</span></span></button>'; }
+  var i=viewInfo(v);
+  return '<button type="button" class="tool" onclick="show(\''+v+'\')"><span class="ticon">'+vico(v)+'</span><span class="ttext"><b>'+esc(i.t)+'</b><span>'+esc(i.d)+'</span></span></button>';
+}
 function buildHome(){
   var home=$('v-home'); if(!home) return;
   var logo=home.querySelector('.homelogo'), tip=$('iostip');
   var dash=document.createElement('div'); dash.id='dash-list'; dash.className='dash';
-  dash.innerHTML='<div class="hero"><div class="herotop"></div><div id="nextstep-list"></div></div>'+
+  dash.innerHTML='<div class="hero"><div class="herotop"></div>'+
+      '<div class="herobody"><div class="herotag">Build your case. File it. See it through.</div>'+
+      '<p class="herolead">Free tools for people representing themselves in Montana courts and state agencies.</p>'+
+      '<div class="herobadges"><span>'+ico('gift')+'Free</span><span>'+ico('shield-check')+'Nothing leaves your phone</span><span>'+ico('map-pin')+'Montana state cases</span></div>'+
+      '<div id="nextstep-list"></div></div></div>'+
     '<div id="install-list"></div>'+
-    '<div class="dsec"><div class="dhead"><h3>What you can do here</h3></div><div class="scope">'+
-      '<button type="button" class="scopecard" onclick="show(\'timeline\')"><span class="ticon">☰</span><b>Build a case file</b><span>A dated chronology, an evidence index, witnesses, letters and deadlines. Useful for any dispute.</span></button>'+
-      '<button type="button" class="scopecard" onclick="show(\'court\')"><span class="ticon">▧</span><b>Go to court</b><span>Public records, open meetings, discrimination after the Bureau, wrongful discharge and small claims.</span></button>'+
-      '<button type="button" class="scopecard" onclick="show(\'parenting\')"><span class="ticon">♡</span><b>Family court</b><span>A parenting plan and a divorce decree, following Montana’s official court forms.</span></button>'+
-      '<button type="button" class="scopecard" onclick="show(\'complaint\')"><span class="ticon">☑</span><b>File with the Human Rights Bureau</b><span>A discrimination complaint, from intake to mediation.</span></button>'+
+    '<div class="dsec reveal"><div class="dhead"><h3>What kind of case is this?</h3></div><div class="paths">'+
+      HOME_PATHS.map(function(p){ return '<button type="button" class="pathcard p-'+p[0]+'" onclick="pickPath(\''+p[0]+'\')"><span class="pathi">'+ico(p[3])+'</span><span class="patht"><b>'+esc(p[1])+'</b><span>'+esc(p[2])+'</span></span><span class="pathgo">'+ico('arrow-right')+'</span></button>'; }).join('')+
     '</div><p class="scopestate"><b>Montana state cases only.</b> Everything here is for Montana state courts and state agencies, such as district court, justice court and the Human Rights Bureau. It does not prepare filings for federal court.</p></div>'+
-    '<div class="dsec"><div class="dhead"><h3>Your case at a glance</h3></div><div id="glance-list"></div></div>'+
+    '<div class="dsec reveal"><div class="dhead"><h3>Your case at a glance</h3></div><div id="glance-list"></div></div>'+
     '<div id="homedates-list"></div>'+
-    '<div class="dsec"><div class="dhead"><h3>Your tools</h3></div><div id="tools-list"></div></div>'+
-    '<div id="savedwork-list"></div>'+
-    '<div class="dhead startread"><h3>Start here</h3></div>';
+    '<div class="dsec reveal" id="tools-anchor"><div class="dhead"><h3>Your tools</h3></div>'+
+      '<div class="htabs" role="tablist">'+HOME_TOOLS.map(function(g){ var n=g[0]==='casefile'?'Case file':g[0]==='court'?'Court':g[0]==='family'?'Family':g[0]==='bureau'?'Bureau':'Support';
+        return '<button type="button" role="tab" class="htab t-'+g[0]+'" data-k="'+g[0]+'" onclick="setHomeTab(\''+g[0]+'\')">'+n+'</button>'; }).join('')+'</div>'+
+      '<div id="tools-list"></div></div>'+
+    '<div id="savedwork-list"></div>';
   var after=tip||logo; after.parentNode.insertBefore(dash, after.nextSibling);
-  if(tip && logo && tip.previousElementSibling===logo){ /* keep the tip above the dashboard */ }
   if(logo) dash.querySelector('.herotop').appendChild(logo);
-  // tools never change, so draw them once
   $('tools-list').innerHTML=HOME_TOOLS.map(function(g){
-    return '<div class="tgroup"><div class="lhead">'+g[0]+'</div><div class="tgrid">'+g[1].map(function(t){
-      if(t[0].indexOf('ct:')===0){ var k=t[0].slice(3), C=window.CT_TYPES&&CT_TYPES[k]; if(!C) return '';
-        return '<button type="button" class="tool" onclick="show(\'court\');ctPick(\''+k+'\')"><span class="ticon">'+C.icon+'</span><span class="ttext"><b>'+esc(C.name)+'</b><span>'+esc(C.blurb)+'</span></span></button>'; }
-      var i=viewInfo(t[0]);
-      return '<button type="button" class="tool" onclick="show(\''+t[0]+'\')"><span class="ticon">'+t[1]+'</span><span class="ttext"><b>'+esc(i.t)+'</b><span>'+esc(i.d)+'</span></span></button>';
-    }).join('')+'</div></div>';
+    return '<div class="tgroup g-'+g[0]+'" data-k="'+g[0]+'"><div class="lhead">'+g[1]+'</div><div class="tgrid">'+g[2].map(toolButton).join('')+'</div></div>';
   }).join('');
+  setHomeTab(homeTab());
+  var hb=$('home-bureau'); if(hb){ var hi=hb.querySelector('.hbi'); if(hi) hi.innerHTML=ico('scale'); }
+  homeReveal();
+}
+/* cards ease in as they scroll into view; everything shows at once for reduced motion, print, or older browsers */
+function homeReveal(){
+  var els=[].slice.call(document.querySelectorAll('.reveal'));
+  var reduce=false; try{ reduce=matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+  if(reduce || !('IntersectionObserver' in window)){ els.forEach(function(e){ e.classList.add('in'); }); return; }
+  var io=new IntersectionObserver(function(en){ en.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('in'); io.unobserve(x.target); } }); },{rootMargin:'0px 0px -6% 0px'});
+  els.forEach(function(e){ var r=e.getBoundingClientRect(); if(r.top<window.innerHeight) e.classList.add('in'); else { e.classList.add('rv'); io.observe(e); } });
+  setTimeout(function(){ els.forEach(function(e){ e.classList.add('in'); }); },4000);
 }
 function nextStep(){
   var c=D.claims||{}, lb=D.meta&&D.meta.lastBackup, days=lb?Math.floor((Date.now()-Date.parse(lb))/864e5):null;
@@ -657,11 +684,12 @@ function renderHome(){
       last? (left<0? '<b class="bad">Passed</b><span>180 days ended '+esc(niceDate(due))+'</span>'
       : '<b class="'+(left<=30?'warn':'')+'">'+left+'</b><span>days left to file with the Bureau · '+esc(niceDate(due))+'</span>')
       : '<b class="mut">—</b><span>Set your deadline</span>';
-  var tile=function(view,inner,cls){ return '<button type="button" class="gtile'+(cls?' '+cls:'')+'" onclick="show(\''+view+'\')">'+inner+'</button>'; };
+  var tile=function(view,inner,cls){ return '<button type="button" class="gtile'+(cls?' '+cls:'')+'" onclick="show(\''+view+'\')"><span class="gti">'+vico(view)+'</span>'+inner+'</button>'; };
   var cnt=function(n,w,empty){ return n? '<b>'+n+'</b><span>'+w+'</span>' : '<b class="mut">0</b><span>'+empty+'</span>'; };
   var idx=-1; for(var i=0;i<STAGES.length;i++) if(STAGES[i][0]===D.stage) idx=i;
   var pct= idx<0?0:Math.round((idx+1)/STAGES.length*100);
-  $('glance-list').innerHTML='<div class="gtiles">'+
+  var fresh=!hasWork() && !last && !lc;
+  $('glance-list').innerHTML=(fresh?'<div class="gfresh">'+ico('sparkles')+'<div><b>Nothing here yet.</b><span>Start with your chronology: every date, one line each. Everything else builds from it.</span></div></div>':'')+'<div class="gtiles">'+
     tile('deadline',dl,'big1')+
     tile('timeline',cnt(D.events.length,D.events.length===1?'chronology entry':'chronology entries','Add your first entry'))+
     tile('exhibits',cnt(D.exhibits.length,D.exhibits.length===1?'exhibit':'exhibits','Log your evidence'))+
@@ -690,12 +718,14 @@ function renderInstall(){
   var box=$('install-list'); if(!box) return;
   if(isInstalled() || !/^https?:$/.test(location.protocol)){ box.innerHTML=''; return; }
   var ios=isIOS();
-  box.innerHTML='<div class="installcard"><span class="ticon">📱</span><div class="it"><b>Put it on your phone</b>'+
+  try{ if(localStorage.getItem('kc_install_later')==='1'){ box.innerHTML=''; return; } }catch(e){}
+  box.innerHTML='<div class="installcard"><span class="ticon">'+ico('smartphone')+'</span><div class="it"><b>Put it on your phone</b>'+
     '<span>Add the Case Builder to your Home Screen. It opens like an app, works without a connection'+
     (ios?', and Safari stops clearing your saved work.':'.')+'</span></div>'+
-    '<button class="pri" onclick="installApp()">Install the app</button></div>';
+    '<div class="ib"><button class="pri" onclick="installApp()">Install the app</button><button class="sec" onclick="installLater()">Not now</button></div></div>';
   var tip=$('iostip'); if(tip) tip.className='';   // this card replaces the older tip
 }
+function installLater(){ try{ localStorage.setItem('kc_install_later','1'); }catch(e){} renderInstall(); }
 function shareIcon(){ return '<svg class="shico" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10H5v10h14V10h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>'; }
 function installApp(){
   if(INSTALL_EVT){
@@ -744,6 +774,17 @@ function addView(id,title,sub,body){
   var s=document.createElement('section'); s.className='view'; s.id='v-'+id;
   s.innerHTML='<h2>'+title+'</h2><p class="sub2">'+sub+'</p>'+body;
   var terms=$('v-terms'); terms.parentNode.insertBefore(s,terms);
+}
+/* one icon set everywhere: the bottom bar and the More sheet use the same drawn icons as the pages */
+function swapNavIcons(){
+  if(!window.vico) return;
+  var go=function(el){ var m=/show\('([a-z]+)'\)/.exec(el.getAttribute('onclick')||''); return m&&m[1]; };
+  document.querySelectorAll('#moresheet .morelink').forEach(function(b){ var v=go(b), s=b.querySelector('.mi'), oc=b.getAttribute('onclick')||''; if(!s) return;
+    if(v&&VIEW_ICON[v]) s.innerHTML=vico(v);
+    else if(/exportAll/.test(oc)) s.innerHTML=ico('download');
+    else if(/1lFgkhsHbcj/.test(oc)) s.innerHTML=ico('book-open');
+    else if(/14U_Z_6bzd/.test(oc)) s.innerHTML=ico('file-text'); });
+  document.querySelectorAll('nav button').forEach(function(b){ var v=b.getAttribute('data-go')||go(b), s=b.querySelector('.ic'); if(s){ if(v&&VIEW_ICON[v]) s.innerHTML=vico(v); else if(/openMore|more/i.test(b.getAttribute('onclick')||'')) s.innerHTML='<svg class="ico" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>'; } });
 }
 function addMenuLink(afterView,view,label,icon,moreAfter){
   var after=function(root,sel,v){ var bs=root.querySelectorAll(sel), r=null;
@@ -826,7 +867,7 @@ function layoutPage(v){
   var id=v.id.slice(2), h2=v.querySelector(':scope > h2'), sub=v.querySelector(':scope > p.sub2');
   if(!h2 || v.dataset.laid) return; v.dataset.laid='1';
   var head=document.createElement('div'); head.className='phead';
-  head.innerHTML='<span class="picon" aria-hidden="true">'+(PAGE_ICONS[id]||'◆')+'</span><div class="ptext"></div>';
+  head.innerHTML='<span class="picon" aria-hidden="true">'+(window.vico&&VIEW_ICON[id]?vico(id):(PAGE_ICONS[id]||'◆'))+'</span><div class="ptext"></div>';
   v.insertBefore(head,h2); head.querySelector('.ptext').appendChild(h2); if(sub) head.querySelector('.ptext').appendChild(sub);
   if(id==='learn') return;   // the full guide is already a list of sections
   var kids=[].slice.call(v.children).filter(function(c){ return c!==head; });
@@ -871,6 +912,7 @@ function initFeatures(){
   if(window.initCourt) initCourt();
   if(window.initFamily) initFamily();
   if(window.initLimits) initLimits();
+  setTimeout(swapNavIcons,0);
   buildFurniture();
   layoutAllPages();
   // show() also refreshes the new pages
