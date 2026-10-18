@@ -230,7 +230,7 @@ function printComplaintForm(){
     try{ buildComplaint(); }catch(e){}
   }
 }
-function _printComplaintForm(){
+function _printComplaintForm(ret){
   // read what is on screen right now, not what was last saved
   var f={}, ids=['cp-name','cp-addr','cp-phone','cp-email','cp-resp','cp-respaddr','cp-respphone',
     'cp-area','cp-grounds','cp-first','cp-last','cp-facts','cp-want'];
@@ -240,7 +240,7 @@ function _printComplaintForm(){
   }
   D.complaint=f; try{ save(); }catch(e){}
   if(!f['cp-name'] && !f['cp-resp'] && !f['cp-grounds'] && !D.events.length){
-    alert('Fill in at least your name or the respondent first, then try again.'); return; }
+    if(ret) return ''; alert('Fill in at least your name or the respondent first, then try again.'); return; }
   // build the plain text first, so there is always a readable version on the page
   try{ buildComplaint(); }catch(e){}
   var picked=(f['cp-grounds']||'').toLowerCase();
@@ -318,6 +318,7 @@ function _printComplaintForm(){
    '</ul>'+
    '<div class="hsig"><span>Signature: <span class="hline"></span></span><span>Date: <span class="hline short"></span></span></div>'+
   '</div>';
+  if(ret) return html;
   $('cp-print').innerHTML=
     '<div class="pvbar noprint">'+
       '<button class="pri" onclick="reprint(\'cp-print\')">Print again</button>'+

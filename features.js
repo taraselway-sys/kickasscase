@@ -522,7 +522,7 @@ function rbPrint(){
 }
 
 /* ================= case packet ================= */
-var PK=[['cover','Cover page',true],['complaint','Complaint draft',true],['chron','Chronology',true],['index','Exhibit index',true],
+var PK=[['cover','Cover page',true],['complaint','Charge of discrimination (the Bureau\u2019s form)',true],['chron','Chronology',true],['index','Exhibit index',true],
   ['thumbs','Thumbnails in the exhibit index',false],['docs','Correspondence log',true],['dates','Deadlines',true],
   ['witnesses','Witness list (keep private unless you must share it)',false]];
 function pkState(){ D.packet=D.packet||{}; PK.forEach(function(p){ if(!(p[0] in D.packet)) D.packet[p[0]]=p[2]; }); return D.packet; }
@@ -536,9 +536,10 @@ function buildPacket(){
   var s=pkState(), c=D.complaint||{}, parts=[], toc=[];
   var sec=function(title,body){ toc.push(title); parts.push('<section class="pksec"><h2>'+(toc.length)+'. '+esc(title)+'</h2>'+body+'</section>'); };
   if(s.complaint){
-    try{ buildComplaint(); }catch(e){}
+    var cf=''; try{ cf=_printComplaintForm(true)||''; }catch(e){ cf=''; }
+    if(!cf){ try{ buildComplaint(); }catch(e){} }
     var t=($('cp-out')&&$('cp-out').value)||'';
-    sec('Complaint draft', t? '<pre class="pkpre">'+esc(t)+'</pre>' : '<p>No complaint drafted yet.</p>');
+    sec('Charge of discrimination', cf? cf : t? '<pre class="pkpre">'+esc(t)+'</pre>' : '<p>No complaint drafted yet.</p>');
   }
   if(s.chron){
     var rows=D.events.map(function(e,i){ return '<tr><td class="n">'+(i+1)+'</td><td class="dcell">'+esc(niceDate(e.d))+'</td><td><div class="wt">'+esc(e.w)+'</div>'+
