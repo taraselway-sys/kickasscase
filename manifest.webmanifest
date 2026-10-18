@@ -1,7 +1,7 @@
 {
   "name": "Kickass Case Builder",
   "short_name": "Case Builder",
-  "description": "Free tools for building a discrimination case file in Montana without a lawyer. Nothing leaves your device.",
+  "description": "Free tools for building a case file in Montana without a lawyer. Nothing leaves your device.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
