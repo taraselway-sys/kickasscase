@@ -650,3 +650,18 @@ h2.famh2{margin:26px 0 6px;color:var(--navy)}
 .limlaw{margin-top:12px;font-size:14.5px;line-height:1.5}
 .limlaw p{margin:0 0 7px}
 .limlaw .limnote{background:#fbf6e6;border:1px solid #ecdcae;border-radius:10px;padding:9px 12px}
+/* the court's complete packet */
+.card.fampack{background:#fbf6e6;border:2px solid var(--gold,#f2b705);border-radius:14px}
+.fampack .fpk{display:inline-block;background:var(--navy,#16304f);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:6px;margin-bottom:8px}
+.fampack h3{margin:0 0 8px;font-size:19px;color:var(--navy,#16304f)}
+.fampack p{margin:0 0 10px;font-size:14.5px;line-height:1.5}
+.fpbtns{display:flex;flex-direction:column;gap:8px}
+a.fpbtn{display:flex;align-items:center;gap:10px;padding:13px 15px;border-radius:11px;background:#fff;border:1px solid #ecdcae;color:var(--navy,#16304f);font-weight:700;font-size:15.5px;text-decoration:none}
+a.fpbtn .fpi{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#efe3bd;flex:0 0 auto}
+a.fpbtn .fpt{display:flex;flex-direction:column;line-height:1.25}
+a.fpbtn small{font-weight:600;color:var(--mut,#5f6b7a);font-size:12px;margin-top:2px}
+a.fpbtn.on{background:var(--navy,#16304f);border-color:var(--navy,#16304f);color:#fff;font-size:17px;padding:15px 16px}
+a.fpbtn.on .fpi{background:var(--gold,#f2b705);color:var(--navy,#16304f)}
+a.fpbtn.on small{color:#d7e0ea}
+.fpremind{margin:14px 0 6px;padding:10px 12px;border-left:4px solid var(--gold,#f2b705);background:#fbf6e6;border-radius:8px}
+.scopestate{margin:10px 0 0;font-size:14.5px;line-height:1.5;background:#fbf6e6;border:1px solid #ecdcae;border-left:4px solid var(--gold,#f2b705);border-radius:11px;padding:11px 14px}

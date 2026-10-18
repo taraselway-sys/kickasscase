@@ -72,6 +72,31 @@ function famWho(p,v){ return v==='1'||v==='2'? famL(p,v) : v==='B'? 'Both parent
 function fb(v){ v=String(v==null?'':v).trim(); return v||'__________'; }   // a blank line on the form
 function fbs(v){ return String(v==null?'':v).trim().replace(/\s*\n\s*/g,' ').replace(/[.\s]+$/,''); }
 
+
+/* the court's complete packet: print all of it, not only the form this page fills in */
+var FAM_PACKS={
+  pp:[['Parenting plan packet','https://courts.mt.gov/forms/ParentPlan/parentingplan-packet.pdf','']],
+  dd:[['Divorce with children','https://courts.mt.gov/external/forms/dissolution/dissolution-child-packet.pdf','sep-yes'],
+      ['Divorce without children','https://courts.mt.gov/external/forms/dissolution/disnokids-packet.pdf','sep-no'],
+      ['Joint divorce with children','https://courts.mt.gov/forms/Dissolution-docs/Joint-Dissolution-of-Marriage-With-Children-8.21.20261.pdf','joint-yes'],
+      ['Joint divorce without children','https://courts.mt.gov/forms/Dissolution-docs/Joint-Dissolution-of-Marriage-Without-Children-8.21.20261.pdf','joint-no']]
+};
+function famPacket(kind){
+  var s=fs(kind), mine=(s.filing||'sep')+'-'+(s.kids||'');
+  var list=FAM_PACKS[kind];
+  return '<div class="card fampack"><div class="fpk">Start here</div><h3>Print the court\u2019s complete packet first</h3>'+
+    '<p><b>You will need the whole packet, not only the form this page fills in.</b> '+(kind==='pp'?
+      'A parenting case also needs the petition, the summons, proof of service, child support financial affidavits and the other forms in the packet.':
+      'A divorce also needs the petition, the summons, proof of service, financial disclosures and the other forms in the packet.')+
+    ' Print it before you start, read the instructions in it, and fill in every form it lists.</p>'+
+    '<div class="fpbtns">'+list.map(function(x){ var on=!x[2]||x[2]===mine;
+      return '<a class="fpbtn'+(on?' on':'')+'" href="'+x[1]+'" target="_blank" rel="noopener"><span class="fpi">\u2193</span><span class="fpt">'+esc(x[0])+'<small>'+(list.length>1&&on&&x[2]?'Your case \u00b7 ':'')+'Complete packet \u00b7 PDF</small></span></a>'; }).join('')+'</div>'+
+    (kind==='dd'?'<p class="note" style="margin:8px 0 0">Not sure which one? Answer the two questions below and your packet is marked.</p>':'')+'</div>';
+}
+function famPacketReminder(kind){
+  return '<div class="note fpremind">This is one form from the court\u2019s packet. File it with the rest of the packet. <a href="'+(kind==='pp'?FAM_PACKS.pp[0][1]:'https://courts.mt.gov/forms/dissolution/kid')+'" target="_blank" rel="noopener">'+(kind==='pp'?'Get the complete packet':'See all the divorce packets')+'</a>.</div>';
+}
+
 /* ---------- inputs ---------- */
 function famId(p,k){ return 'fm-'+p+'-'+k; }
 function fT(p,k,label,ph){ var id=famId(p,k); return '<label class="fl" for="'+id+'">'+label+'</label><input type="text" id="'+id+'" value="'+esc(famV(p,k))+'" placeholder="'+esc(ph||'')+'" oninput="fSet(\''+p+'\',\''+k+'\',this.value)">'; }
@@ -205,7 +230,7 @@ function renderParenting(){
   if(!s.myname && c['cp-name']) s.myname=c['cp-name'];
   if(!s.filing) s.filing='sep'; if(!s.me) s.me='1';
   var L1=famL(P,'1'), L2=famL(P,'2');
-  var h=famWarn('pp');
+  var h=famPacket('pp')+famWarn('pp');
   h+=famForms('pp','This page follows the court’s Proposed Parenting Plan, form MP-300, section by section, in the same order and with the same choices. Use it to fill in the official form, or print the draft and compare it line by line. The complete packet has every form you need to start a parenting case, and instructions.');
   h+=famBefore([
     ['Who can file','Either parent, or both together. Montana can usually decide only if Montana is the children’s home state: they lived here for the 6 months before the case was filed, or since birth if they are younger. Section 40-7-201, MCA.'],
@@ -334,7 +359,7 @@ function renderParenting(){
   h+=famCard('18. Other Provisions',fA(P,'other18','Anything else','Neither parent will discuss this case with the children.'));
   h+=famCard('19. Request for Parenting Plan be Ordered by the Court',fS(P,'req','Who asks the Court to adopt this plan',famParties(P,[['B','Both']]))+
     fNote('Your plan ends with the form’s warning about contempt, both parents’ signature lines under penalty of perjury, and the Order by the Court for the judge.'));
-  h+=famOutput('pp','parenting plan');
+  h+=famPacketReminder('pp')+famOutput('pp','parenting plan');
   box.innerHTML=h; famCourtName(P);
 }
 
@@ -498,7 +523,7 @@ function renderDecree(){
   if(!s.myname && c['cp-name']) s.myname=c['cp-name'];
   if(!s.filing) s.filing='sep'; if(!s.me) s.me='1';
   var kids=s.kids==='yes', joint=s.filing==='joint', L1=famL(P,'1'), L2=famL(P,'2');
-  var h=famWarn('dd');
+  var h=famPacket('dd')+famWarn('dd');
   h+=famForms('dd','This page follows the court’s decree forms in the same order and with the same choices: MP-703 when you have minor children together, and MP-713 when you do not. The Property Distribution at the bottom follows form MP-500, sections 1 to 10. If you file together, the joint packets use MP-721 or MP-722, which cover the same findings. The complete packets list every form you need, in order, with instructions.');
   h+=famBefore([
     ['Who can file','One spouse must have lived in Montana, or been stationed here in the military, for 90 days before filing. Section 40-4-104, MCA.'],
@@ -571,7 +596,7 @@ function renderDecree(){
   if(s.maint==='pay') dc+=fSub(fPS(P,'mPayer','Who pays')+fT(P,'mAmt','Amount per month','$')+(kids?'':fD(P,'mStart','Starting date'))+fD(P,'mEnd','Date of last payment')+fT(P,'mDay','Day of each month it is paid','1st'));
   dc+=fA(P,'otherDec','Other provisions (optional)');
   h+=famCard('Decree of dissolution of marriage',dc);
-  h+=famOutput('dd','decree');
+  h+=famPacketReminder('dd')+famOutput('dd','decree');
 
   // ---------- property distribution, MP-500 ----------
   var PD='pd', pty='party';
@@ -610,7 +635,7 @@ function renderDecree(){
   g+=famCard('8. Disclosure of Debts',s8);
   g+=famCard('9. Additional Assets or Debts',fR(PD,'more','Choose one',[['all','All of our assets and debts are listed on this form'],['more','More are listed on attached pages, or on forms MP-500-A to MP-500-D']]));
   g+=famCard('10. Other',fA(PD,'other10','Anything else (optional)'));
-  g+=famOutput('pd','property distribution');
+  g+=famPacketReminder('dd')+famOutput('pd','property distribution');
   box.innerHTML=h+g; famCourtName(P);
 }
 var PD_DEBT=[['home','Home / real property loan'],['veh','Vehicle loan'],['util','Past due utility bill'],['card','Credit card'],['student','Student loan'],['med','Past due medical bill'],['other','Other liability']];

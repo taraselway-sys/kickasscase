@@ -611,7 +611,7 @@ function buildHome(){
       '<button type="button" class="scopecard" onclick="show(\'court\')"><span class="ticon">▧</span><b>Go to court</b><span>Public records, open meetings, wrongful discharge and small claims.</span></button>'+
       '<button type="button" class="scopecard" onclick="show(\'parenting\')"><span class="ticon">♡</span><b>Family court</b><span>A parenting plan and a divorce decree, following Montana’s official court forms.</span></button>'+
       '<button type="button" class="scopecard" onclick="show(\'complaint\')"><span class="ticon">☑</span><b>File with the Human Rights Bureau</b><span>A discrimination complaint, from intake to mediation.</span></button>'+
-    '</div></div>'+
+    '</div><p class="scopestate"><b>Montana state cases only.</b> Everything here is for Montana state courts and state agencies, such as district court, justice court and the Human Rights Bureau. It does not prepare filings for federal court.</p></div>'+
     '<div class="dsec"><div class="dhead"><h3>Your case at a glance</h3></div><div id="glance-list"></div></div>'+
     '<div id="homedates-list"></div>'+
     '<div class="dsec"><div class="dhead"><h3>Your tools</h3></div><div id="tools-list"></div></div>'+
