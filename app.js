@@ -429,7 +429,7 @@ function printPage(id){
   var clone=v.cloneNode(true);
   // open every collapsed section, and drop anything interactive
   clone.querySelectorAll('details').forEach(function(d){ d.setAttribute('open',''); });
-  clone.querySelectorAll('h2, .sub2, button, input, textarea, select, .printout, .saved, .row, .srchwrap')
+  clone.querySelectorAll('h2, .sub2, button, input, textarea, select, .printout, .saved, .row, .srchwrap, .dash')
        .forEach(function(e){ e.remove(); });
   // labels that belonged to the fields just removed, and worksheet cards left with nothing to read
   clone.querySelectorAll('label.fl, label[for]').forEach(function(e){ e.remove(); });
@@ -896,7 +896,7 @@ function renderChecks(){
 }
 function toggleCheck(i,v){ D.checks[i]=v; save(); renderChecks(); }
 /* ---- export / import / reset ---- */
-function markBackedUp(){ D.meta=D.meta||{}; D.meta.lastBackup=new Date().toISOString(); save(); if(noticeKind==='backup') hideNotice(); }
+function markBackedUp(){ D.meta=D.meta||{}; D.meta.lastBackup=new Date().toISOString(); save(); if(noticeKind==='backup') hideNotice(); if(window.renderHome) renderHome(); }
 function backupName(locked){ return 'my-case-file-'+new Date().toISOString().slice(0,10)+(locked?'-protected':'')+'.json'; }
 function exportAll(){
   D.meta=D.meta||{};

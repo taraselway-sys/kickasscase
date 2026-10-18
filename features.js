@@ -99,7 +99,7 @@ function itemTools(list,id,msg,render,extra){
     '<button type="button" class="ilink" onclick="editItem(\''+list+'\',\''+id+'\')">edit</button>'+
     '<button type="button" class="ilink del" onclick="removeItem(\''+list+'\',\''+id+'\',\''+msg+'\','+render+')">remove</button></span>';
 }
-function refreshAll(){ try{ renderEvents(); renderExhibits(); renderWitnesses(); renderDocs(); renderHomeDates(); }catch(e){} }
+function refreshAll(){ try{ renderEvents(); renderExhibits(); renderWitnesses(); renderDocs(); renderHome(); }catch(e){} }
 
 /* ================= chronology ================= */
 function blankEvLinks(){ return {ex:[],wt:[],tags:[],pa:false}; }
@@ -581,6 +581,82 @@ function buildPacket(){
   showPrintView('pk-print');
 }
 
+
+/* ================= home dashboard ================= */
+var HOME_TOOLS=[
+ ['Build your case',[['complaint','☑'],['deadline','◷'],['timeline','☰'],['exhibits','▣'],['witnesses','✎'],['docs','✉'],['records','▤'],['dates','⧗']]],
+ ['Asking and arguing',[['rebuttal','⇄'],['damages','¤'],['mediation','⚖'],['nocause','⚠'],['packet','⎘']]],
+ ['Support',[['ai','⌘'],['care','❦'],['checklist','✓'],['howto','ⓘ']]]];
+function viewInfo(v){
+  var sec=$('v-'+v); if(!sec) return {t:v,d:''};
+  var h=sec.querySelector('h2'), sb=sec.querySelector('.sub2');
+  var d=sb? sb.cloneNode(true) : null;
+  if(d){ d.querySelectorAll('[id]').forEach(function(x){ x.remove(); }); }
+  var txt=d? d.textContent.replace(/\s+/g,' ').trim() : '';
+  var first=(txt.match(/^.*?[.!?](\s|$)/)||[txt])[0].trim();
+  return {t:h?h.textContent.trim():v, d:first};
+}
+function buildHome(){
+  var home=$('v-home'); if(!home) return;
+  var logo=home.querySelector('.homelogo'), tip=$('iostip');
+  var dash=document.createElement('div'); dash.id='dash-list'; dash.className='dash';
+  dash.innerHTML='<div class="hero"><div class="herotop"></div><div id="nextstep-list"></div></div>'+
+    '<div class="dsec"><div class="dhead"><h3>Your case at a glance</h3></div><div id="glance-list"></div></div>'+
+    '<div id="homedates-list"></div>'+
+    '<div class="dsec"><div class="dhead"><h3>Your tools</h3></div><div id="tools-list"></div></div>'+
+    '<div id="savedwork-list"></div>'+
+    '<div class="dhead startread"><h3>Start here</h3></div>';
+  var after=tip||logo; after.parentNode.insertBefore(dash, after.nextSibling);
+  if(tip && logo && tip.previousElementSibling===logo){ /* keep the tip above the dashboard */ }
+  if(logo) dash.querySelector('.herotop').appendChild(logo);
+  // tools never change, so draw them once
+  $('tools-list').innerHTML=HOME_TOOLS.map(function(g){
+    return '<div class="tgroup"><div class="lhead">'+g[0]+'</div><div class="tgrid">'+g[1].map(function(t){ var i=viewInfo(t[0]);
+      return '<button type="button" class="tool" onclick="show(\''+t[0]+'\')"><span class="ticon">'+t[1]+'</span><span class="ttext"><b>'+esc(i.t)+'</b><span>'+esc(i.d)+'</span></span></button>';
+    }).join('')+'</div></div>';
+  }).join('');
+}
+function nextStep(){
+  var c=D.claims||{}, lb=D.meta&&D.meta.lastBackup, days=lb?Math.floor((Date.now()-Date.parse(lb))/864e5):null;
+  if(!(D.deadline&&D.deadline.last)) return ['deadline','Work out your filing deadline','180 days from the most recent act. It is the single most common reason a good claim is lost.','Open the deadline calculator'];
+  if(!D.events.length) return ['timeline','Start your chronology','Every date, one line each. This becomes your complaint.','Add your first entry'];
+  if(!(c.claims&&c.claims.length)) return ['complaint','Work out what you are claiming','Only what you name gets investigated. Four questions on the Complaint page.','Answer the four questions'];
+  if(!D.exhibits.length) return ['exhibits','Log your first exhibit','Your files live in Google Drive. The index here is what makes them usable.','Open your evidence'];
+  if(!D.stage) return ['stage','Mark where you are in the process','Tap the stage you are at to see what happens there and what to do now.','Where am I?'];
+  if(hasWork() && (days===null||days>=7)) return ['backup',(lb?'It has been '+dayWord(days)+' since your last backup':'Back up your work'),'Everything you enter is stored only on this device. Keep a copy somewhere safe.','Back up now'];
+  return ['packet','Your case file is taking shape','Put the complaint, chronology, exhibit index and deadlines into one printable packet.','Build the case packet'];
+}
+function renderHome(){
+  if(!$('dash-list')) return;
+  var n=nextStep();
+  $('nextstep-list').innerHTML='<div class="next"><div class="nk">Your next step</div><div class="nt">'+esc(n[1])+'</div><div class="nd">'+esc(n[2])+'</div>'+
+    '<button class="pri" onclick="'+(n[0]==='backup'?'exportAll()':"show('"+n[0]+"')")+'">'+esc(n[3])+' →</button></div>';
+  // at a glance
+  var last=D.deadline&&D.deadline.last, left=null, due='';
+  if(last){ due=addDays(last,180); left=daysBetween(todayISO(),due); }
+  var dl= last? (left<0? '<b class="bad">Passed</b><span>180 days ended '+esc(niceDate(due))+'</span>'
+      : '<b class="'+(left<=30?'warn':'')+'">'+left+'</b><span>days left to file · '+esc(niceDate(due))+'</span>')
+      : '<b class="mut">—</b><span>Set your deadline</span>';
+  var tile=function(view,inner,cls){ return '<button type="button" class="gtile'+(cls?' '+cls:'')+'" onclick="show(\''+view+'\')">'+inner+'</button>'; };
+  var cnt=function(n,w,empty){ return n? '<b>'+n+'</b><span>'+w+'</span>' : '<b class="mut">0</b><span>'+empty+'</span>'; };
+  var idx=-1; for(var i=0;i<STAGES.length;i++) if(STAGES[i][0]===D.stage) idx=i;
+  var pct= idx<0?0:Math.round((idx+1)/STAGES.length*100);
+  $('glance-list').innerHTML='<div class="gtiles">'+
+    tile('deadline',dl,'big1')+
+    tile('timeline',cnt(D.events.length,D.events.length===1?'chronology entry':'chronology entries','Add your first entry'))+
+    tile('exhibits',cnt(D.exhibits.length,D.exhibits.length===1?'exhibit':'exhibits','Log your evidence'))+
+    tile('witnesses',cnt(D.witnesses.length,D.witnesses.length===1?'witness':'witnesses','List who saw it'))+'</div>'+
+    '<button type="button" class="gstage" onclick="show(\'stage\')"><div class="gsl"><span>Where you are</span><b>'+
+      (idx<0?'Tap to mark your stage':esc(STAGES[idx][1])+' · step '+(idx+1)+' of '+STAGES.length)+'</b></div>'+
+      '<div class="gbar"><span style="width:'+pct+'%"></span></div></button>';
+  // saved work
+  var lb=D.meta&&D.meta.lastBackup, bd=lb?Math.floor((Date.now()-Date.parse(lb))/864e5):null;
+  $('savedwork-list').innerHTML='<div class="saved-strip"><div class="sw-t"><b>Your saved work</b><span>'+
+    (lb? 'Last backup '+(bd===0?'today':dayWord(bd)+' ago') : 'Not backed up yet')+' · stored only on this device</span></div>'+
+    '<div class="sw-b"><button class="pri" onclick="exportAll()">Back up</button><button class="sec" onclick="document.getElementById(\'imp\').click()">Restore</button></div></div>';
+  renderHomeDates();
+}
+
 /* ================= search your own entries ================= */
 function dataHits(q){
   var terms=q.toLowerCase().split(/\s+/).filter(function(x){return x.length>1;}); if(!terms.length) return [];
@@ -645,9 +721,7 @@ function buildFurniture(){
     '<div class="card"><h3 style="margin-top:0">What to include</h3><div id="pk-list"></div>'+
     '<div class="row"><button class="pri" onclick="buildPacket()">Build the case packet</button></div></div>'+
     '<div id="pk-print" class="printout" style="display:none"></div>');
-  // home: coming-up card
-  var home=$('v-home'), firstCard=home && home.querySelector('.card,details');
-  if(firstCard){ var hd=document.createElement('div'); hd.id='homedates-list'; firstCard.parentNode.insertBefore(hd,firstCard); }
+  buildHome();
   addMenuLink('deadline','dates','Your deadlines','\u29d7');
   addMenuLink('exhibits','packet','Case packet','\u2398');
 }
@@ -663,7 +737,7 @@ function initFeatures(){
     if(id==='complaint'){ renderClaimWizard(); updateMeter(); }
     if(id==='rebuttal') renderRebuttal();
     if(id==='packet') renderPacket();
-    if(id==='home') renderHomeDates();
+    if(id==='home') renderHome();
   };
   // search: your own entries first, then the guide
   var _search=searchApp;
@@ -676,5 +750,5 @@ function initFeatures(){
   };
   // a restored backup or a deleted record can leave the edit forms pointing nowhere
   var _calc=calcDeadline; window.calcDeadline=function(){ _calc(); renderHomeDates(); };
-  renderClaimWizard(); updateMeter(); renderRebuttal(); renderPacket(); renderDates(); renderHomeDates();
+  renderClaimWizard(); updateMeter(); renderRebuttal(); renderPacket(); renderDates(); renderHome();
 }
