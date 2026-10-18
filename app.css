@@ -605,3 +605,14 @@ button.scopecard .ticon{margin-bottom:2px}
 ol.isteps{margin:6px 0 10px;padding-left:22px}
 ol.isteps li{margin:0 0 10px;font-size:15px;line-height:1.5}
 svg.shico{vertical-align:-4px;color:#0a84ff}
+
+/* ===== family court ===== */
+.kidrow,.proprow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px;padding:0 0 10px;border-bottom:1px dashed var(--line)}
+.kidrow input[type=text],.proprow input[type=text]:first-child{flex:2 1 220px}
+.kidrow input[type=date]{flex:1 1 150px;width:auto}
+.proprow input[type=text]:nth-child(2){flex:1 1 110px;width:auto}
+.proprow select{flex:1 1 170px;width:auto}
+table.holtab{width:100%;border-collapse:collapse}
+table.holtab td{padding:6px 0;border-bottom:1px solid var(--line);font-size:14.5px;vertical-align:middle}
+table.holtab td:first-child{width:42%;font-weight:600;color:var(--navy);padding-right:10px}
+@media (min-width:620px){ .scope{grid-template-columns:repeat(2,1fr)} }

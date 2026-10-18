@@ -586,6 +586,7 @@ function buildPacket(){
 var HOME_TOOLS=[
  ['Build your case file',[['timeline','☰'],['exhibits','▣'],['witnesses','✎'],['docs','✉'],['records','▤'],['dates','⧗'],['packet','⎘']]],
  ['Court filings, outside the Bureau',[['ct:records'],['ct:meetings'],['ct:wdea'],['ct:small'],['ct:hrb']]],
+ ['Family court',[['parenting','♡'],['decree','⧉']]],
  ['A discrimination complaint with the Human Rights Bureau',[['complaint','☑'],['deadline','◷'],['stage','◴'],['rebuttal','⇄'],['damages','¤'],['mediation','⚖'],['nocause','⚠']]],
  ['Support',[['ai','⌘'],['care','❦'],['checklist','✓'],['howto','ⓘ']]]];
 function viewInfo(v){
@@ -606,6 +607,7 @@ function buildHome(){
     '<div class="dsec"><div class="dhead"><h3>What you can do here</h3></div><div class="scope">'+
       '<button type="button" class="scopecard" onclick="show(\'timeline\')"><span class="ticon">☰</span><b>Build a case file</b><span>A dated chronology, an evidence index, witnesses, letters and deadlines. Useful for any dispute.</span></button>'+
       '<button type="button" class="scopecard" onclick="show(\'court\')"><span class="ticon">▧</span><b>Go to court</b><span>Public records, open meetings, wrongful discharge and small claims.</span></button>'+
+      '<button type="button" class="scopecard" onclick="show(\'parenting\')"><span class="ticon">♡</span><b>Family court</b><span>A parenting plan and a divorce decree, drafted for district court.</span></button>'+
       '<button type="button" class="scopecard" onclick="show(\'complaint\')"><span class="ticon">☑</span><b>File with the Human Rights Bureau</b><span>A discrimination complaint, from intake to mediation.</span></button>'+
     '</div></div>'+
     '<div class="dsec"><div class="dhead"><h3>Your case at a glance</h3></div><div id="glance-list"></div></div>'+
@@ -799,7 +801,7 @@ function buildFurniture(){
    the working tools come first, and reading cards fold into expandable panels. */
 var PAGE_ICONS={deadline:'◷',timeline:'☰',exhibits:'▣',witnesses:'✎',docs:'✉',records:'▤',complaint:'☑',
   stage:'◴',rebuttal:'⇄',damages:'¤',mediation:'⚖',nocause:'⚠',ai:'⌘',care:'❦',checklist:'✓',
-  howto:'ⓘ',court:'▧',dates:'⧗',packet:'⎘',terms:'©',learn:'§'};
+  howto:'ⓘ',court:'▧',parenting:'♡',decree:'⧉',dates:'⧗',packet:'⎘',terms:'©',learn:'§'};
 function wordsIn(el){ return (el.textContent||'').trim().split(/\s+/).filter(Boolean).length; }
 function cardToPanel(card){
   var h=card.querySelector(':scope > h3, :scope > h4'), title='';
@@ -859,6 +861,7 @@ function initFeatures(){
   if(ensureIds()) save();
   window.iosTip=function(){ renderInstall(); };   // the install card replaces the older tip
   if(window.initCourt) initCourt();
+  if(window.initFamily) initFamily();
   buildFurniture();
   layoutAllPages();
   // show() also refreshes the new pages
