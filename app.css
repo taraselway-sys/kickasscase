@@ -822,3 +822,8 @@ button.dlink:active{background:var(--tint)}
 /* temporary: formatting update notice */
 .updnote{background:#fff7e0;border:1px solid #f2b705;border-left:5px solid #f2b705;border-radius:10px;padding:10px 12px;margin:0 0 14px;font-size:14px;line-height:1.45;color:#3a2e00}
 @media print{.updnote{display:none !important}}
+
+/* sources list on reading pages */
+ul.srclist{margin:4px 0 14px;padding-left:18px}
+ul.srclist li{font-size:13px;line-height:1.5;margin:0 0 7px;color:#333}
+ul.srclist a{white-space:nowrap;font-weight:600}

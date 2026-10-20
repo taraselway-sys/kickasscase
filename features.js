@@ -785,7 +785,7 @@ var MENU=[
  ['Go to court',[['court','Court filings']]],
  ['Family court',[['parenting','Parenting plan'],['decree','Divorce decree']]],
  ['Human Rights Bureau',[['complaint','The complaint'],['stage','Where am I?'],['rebuttal','The rebuttal'],['damages','What you are owed'],['mediation','Mediation'],['nocause','If you get “no reasonable cause”']]],
- ['Support',[['ai','Working with Claude'],['care','Looking after yourself'],['checklist','Progress checklist']]],
+ ['Support',[['ai','Working with Claude'],['care','Looking after yourself'],['blamed','Why They Blame You'],['checklist','Progress checklist']]],
  ['Your saved work',[['act:exportAll()','Back up my work','download'],['act:document.getElementById(\'imp\').click()','Restore from a backup','upload']]],
  ['The full guide (Human Rights Bureau cases)',[['learn','Pro Se Power! — read the whole guide'],['url:'+GUIDE_PDF,'Pro Se Power! Guide & Workbook (PDF)','book-open'],['url:'+SHEETS_PDF,'Blank worksheets only (PDF)','file-text']]],
  ['About',[['terms','Terms and disclaimer']]]];
@@ -894,7 +894,7 @@ function buildFurniture(){
    the working tools come first, and reading cards fold into expandable panels. */
 var PAGE_ICONS={deadline:'◷',timeline:'☰',exhibits:'▣',witnesses:'✎',docs:'✉',records:'▤',complaint:'☑',
   stage:'◴',rebuttal:'⇄',damages:'¤',mediation:'⚖',nocause:'⚠',ai:'⌘',care:'❦',checklist:'✓',
-  howto:'ⓘ',court:'▧',parenting:'♡',decree:'⧉',dates:'⧗',packet:'⎘',terms:'©',learn:'§'};
+  howto:'ⓘ',blamed:'◉',court:'▧',parenting:'♡',decree:'⧉',dates:'⧗',packet:'⎘',terms:'©',learn:'§'};
 function wordsIn(el){ return (el.textContent||'').trim().split(/\s+/).filter(Boolean).length; }
 function cardToPanel(card){
   var h=card.querySelector(':scope > h3, :scope > h4'), title='';
@@ -1000,4 +1000,9 @@ function initFeatures(){
   // a restored backup or a deleted record can leave the edit forms pointing nowhere
   var _calc=calcDeadline; window.calcDeadline=function(){ _calc(); renderHomeDates(); };
   renderClaimWizard(); updateMeter(); renderRebuttal(); renderPacket(); renderDates(); renderHome();
+  // a shared link can open one page directly: kickasscase.netlify.app/notyourfault -> /?page=notyourfault
+  try{ var pq=new URLSearchParams(location.search).get('page'); var PAGE_ALIAS={notyourfault:'blamed'};
+    var pid=pq&&(PAGE_ALIAS[pq]||pq);
+    if(pid && document.getElementById('v-'+pid)){ setTimeout(function(){ show(pid); window.scrollTo(0,0); },0); }
+  }catch(e){}
 }
