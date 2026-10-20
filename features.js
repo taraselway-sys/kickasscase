@@ -13,7 +13,7 @@ function ensureIds(){
 function byId(list,id){ for(var i=0;i<list.length;i++) if(list[i].id===id) return list[i]; return null; }
 function idxOf(list,id){ for(var i=0;i<list.length;i++) if(list[i].id===id) return i; return -1; }
 function exNum(id){ return idxOf(D.exhibits,id)+1; }
-function short(t,n){ t=String(t||''); n=n||60; return t.length>n? t.slice(0,n-1).trim()+'\u2026' : t; }
+function short(t,n){ t=String(t||''); n=n||60; return t.length>n? t.slice(0,n-1).replace(/[\s.,;:]+$/,'').replace(/\s+\S*$/,'')+'\u2026' : t; }
 var MONTHS_F=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function niceDate(x){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(x||''); return m? MONTHS_F[+m[2]-1]+' '+(+m[3])+', '+m[1] : (x||''); }
 function hrbDue(d){ return window.limCompute? limCompute(limByKey('hrb'),d,{}).due : addDays(d,180); }
@@ -537,12 +537,14 @@ function renderPacket(){
 function tbl(head,rows){ return '<table><thead><tr>'+head.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr></thead><tbody>'+rows+'</tbody></table>'; }
 function buildPacket(){
   var s=pkState(), c=D.complaint||{}, parts=[], toc=[];
-  var sec=function(title,body){ toc.push(title); parts.push('<section class="pksec"><h2>'+(toc.length)+'. '+esc(title)+'</h2>'+body+'</section>'); };
+  var sec=function(title,body,bare){ toc.push(title);
+    parts.push('<section class="pksec pk-'+title.toLowerCase().split(' ')[0]+(bare?' pkbare':'')+'">'+(bare?'':'<h2><span class="pknum">'+toc.length+'.</span> '+esc(title)+'</h2>')+body+'</section>'); };
   if(s.complaint){
     var cf=''; try{ cf=_printComplaintForm(true)||''; }catch(e){ cf=''; }
     if(!cf){ try{ buildComplaint(); }catch(e){} }
     var t=($('cp-out')&&$('cp-out').value)||'';
-    sec('Charge of discrimination', cf? cf : t? '<pre class="pkpre">'+esc(t)+'</pre>' : '<p>No complaint drafted yet.</p>');
+    // the Bureau's form carries its own title, so it gets no packet heading above it
+    sec('Charge of discrimination', cf? cf : t? '<pre class="pkpre">'+esc(t)+'</pre>' : '<p>No complaint drafted yet.</p>', !!cf);
   }
   if(s.chron){
     var rows=D.events.map(function(e,i){ return '<tr><td class="n">'+(i+1)+'</td><td class="dcell">'+esc(niceDate(e.d))+'</td><td><div class="wt">'+esc(e.w)+'</div>'+
@@ -571,12 +573,11 @@ function buildPacket(){
   if(!parts.length && !s.cover){ alert('Pick at least one part to include.'); return; }
   var cover='';
   if(s.cover){
+    var row=function(k,v){ return v? '<tr><th>'+k+'</th><td>'+esc(v)+'</td></tr>' : ''; };
     cover='<section class="pkcover"><h1>Case packet</h1>'+
-      (c['cp-name']?'<p class="pkline"><b>Charging party:</b> '+esc(c['cp-name'])+'</p>':'')+
-      (c['cp-resp']?'<p class="pkline"><b>Respondent:</b> '+esc(c['cp-resp'])+'</p>':'')+
-      (c['cp-grounds']?'<p class="pkline"><b>Basis:</b> '+esc(c['cp-grounds'])+'</p>':'')+
-      '<p class="pkline"><b>Prepared:</b> '+pdate()+'</p>'+
-      (toc.length?'<h3>Contents</h3><ol>'+toc.map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ol>':'')+'</section>';
+      '<table class="pkparties">'+row('Charging party',c['cp-name'])+row('Respondent',c['cp-resp'])+row('Basis',c['cp-grounds'])+
+        '<tr><th>Prepared</th><td>'+pdate()+'</td></tr></table>'+
+      (toc.length?'<h3>Contents</h3><ol class="pktoc">'+toc.map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ol>':'')+'</section>';
   }
   $('pk-print').innerHTML='<div class="pvbar noprint"><button class="pri" onclick="reprint(\'pk-print\')">Print again</button>'+
     '<button class="sec" onclick="closePrint(\'pk-print\')">Close</button></div>'+

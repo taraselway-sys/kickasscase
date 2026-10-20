@@ -264,7 +264,7 @@ function _printComplaintForm(asHtml){
     for(var q=0;q<raw.length;q++){ var t=raw[q].replace(/\s*\n\s*/g,' ').trim();
       if(t) paras.push(t.replace(/^\s*[A-Za-z0-9]{1,2}[.)]\s+/,'')); }
   } else if(D.events.length){
-    paras=D.events.map(function(e){ return 'On '+niceDate(e.d)+', '+e.w+(e.who?' Present: '+e.who+'.':''); });
+    paras=D.events.map(function(e){ return 'On '+niceDate(e.d)+', '+lcFirst(e.w)+(e.who?' Present: '+e.who+'.':''); });
   }
   paras=withClaims(paras);
   var letters=function(n){ var s=''; n++; while(n>0){ var m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26);} return s; };
@@ -302,8 +302,8 @@ function _printComplaintForm(asHtml){
    '<table class="hgrid hbasis"><tr>'+
     '<td class="hb1"><div class="hlab">BASIS OF DISCRIMINATION</div><div class="hval">'+basis+'</div></td>'+
     '<td class="hb2"><div class="hlab">DATE OF DISCRIMINATION</div>'+
-      '<div class="hval">Earliest: '+esc(nice(f['cp-first']))+'</div>'+
-      '<div class="hval" style="margin-top:8pt">Latest: '+esc(nice(f['cp-last']))+'</div></td>'+
+      '<div class="hdate">Earliest: '+esc(nice(f['cp-first']))+'</div>'+
+      '<div class="hdate hlatest">Latest: '+esc(nice(f['cp-last']))+'</div></td>'+
    '</tr></table>'+
    '<div class="hbody">'+
    '<div class="hsec">PARTICULARS OF THE CHARGE</div>'+
@@ -311,13 +311,13 @@ function _printComplaintForm(asHtml){
      ' in violation of the Montana Human Rights Act (MHRA)'+(gov?', and the Governmental Code of Fair Practices (GCFP),':',')+
      ' for the following reasons:</p>'+
    body+
-   '<div class="hsec hver">VERIFICATION</div>'+
+   '<div class="hverwrap"><div class="hsec hver">VERIFICATION</div>'+
    '<ul class="hvl">'+
     '<li>I hereby file this charge with the above-cited agency.</li>'+
     '<li>I agree to inform the agency if I change my address or telephone number and I agree to cooperate fully in the processing of my charge in accordance with its procedures.</li>'+
     '<li>I swear or affirm that I have read the above charge and I declare under penalty of perjury that the foregoing is true and correct.</li>'+
    '</ul>'+
-   '<div class="hsig"><span>Signature: <span class="hline"></span></span><span>Date: <span class="hline short"></span></span></div>'+
+   '<div class="hsig"><span>Signature: <span class="hline"></span></span><span>Date: <span class="hline short"></span></span></div></div>'+
    '</div><div class="hrev">Revised 8/2020</div>'+
   '</div>';
   if(asHtml) return html;
@@ -683,13 +683,22 @@ function renderRequests(){
 }
 function delRequest(i){ if(confirm('Remove from the log?')){ D.requests.splice(i,1); save(); renderRequests(); } }
 function copyOut(id){ var t=$(id); t.select(); try{document.execCommand('copy'); alert('Copied.');}catch(e){ alert('Select the text and copy it.'); } }
+/* "On March 4, 2026, Hired as..." reads wrong: lower-case the first word after the date,
+   unless it is a month, a weekday, "I", or the start of a name ("Dale Pruett said..."). */
+function lcFirst(t){
+  t=String(t||''); var m=/^([A-Z][a-z']*)(\s+)(\S*)/.exec(t); if(!m) return t;
+  var w=m[1], nx=m[3];
+  if(/^(I|January|February|March|April|May|June|July|August|September|October|November|December|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$/.test(w)) return t;
+  if(/^[A-Z]/.test(nx) && !/ed$/.test(w)) return t;
+  return w.charAt(0).toLowerCase()+t.slice(1);
+}
 /* ---- complaint ---- */
 function buildComplaint(){
   var f={}; ['cp-name','cp-addr','cp-phone','cp-email','cp-resp','cp-respaddr','cp-respphone',
            'cp-area','cp-grounds','cp-first','cp-last','cp-facts','cp-want'].forEach(function(k){ f[k]=$(k).value.trim(); });
   D.complaint=f; save();
   var body=D.events.length&&!f['cp-facts'] ? D.events.map(function(e,i){
-      return String.fromCharCode(65+i)+'. On '+niceDate(e.d)+', '+e.w+(e.who?' Present: '+e.who+'.':''); }).join('\n\n') : f['cp-facts'];
+      return String.fromCharCode(65+i)+'. On '+niceDate(e.d)+', '+lcFirst(e.w)+(e.who?' Present: '+e.who+'.':''); }).join('\n\n') : f['cp-facts'];
   body=withClaimsText(body);
   var t='CHARGE OF DISCRIMINATION\nFiled before: Montana Department of Labor & Industry, Human Rights Bureau\n\n'+
   'CHARGING PARTY\n'+f['cp-name']+'\n'+f['cp-addr']+'\n'+f['cp-phone']+(f['cp-email']?' \u00b7 '+f['cp-email']:'')+'\n\n'+

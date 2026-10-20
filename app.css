@@ -341,42 +341,52 @@ body.printframe .printframe-body{max-width:none}
 @media(min-width:700px){main{padding:24px}header h1{font-size:25px}header .punch{font-size:13.5px}.band .tagline{font-size:17px}.band{padding:14px 24px}header .byline{font-size:12px}}
 
 /* ---- the charge form, laid out like the Bureau's own ---- */
-.hrbform{font-family:'Times New Roman',Times,'Liberation Serif',serif;color:#000;background:#fff;font-size:11pt;line-height:1.3;max-width:7.3in;margin:0 auto}
+.hrbform{font-family:'Times New Roman',Times,'Liberation Serif',serif;color:#000;background:#fff;font-size:11pt;line-height:1.3;max-width:7.5in;margin:0 auto}
 .hrbform table.hgrid{width:100%;border-collapse:collapse;table-layout:fixed}
 .hrbform .hgrid td{border:1px solid #000;vertical-align:top;padding:4pt 6pt 6pt}
-.hrbform .hgrid td.hc1{width:45%}
-.hrbform .hgrid td.hc2{width:55%}
+.hrbform .hgrid td.hc1{width:44%}
+.hrbform .hgrid td.hc2{width:56%}
 .hrbform .hbasis{margin-top:-1px}
-.hrbform .hbasis td.hb1{width:70%}
-.hrbform .hbasis td.hb2{width:30%}
-.hrbform .htitle{font-size:14pt;letter-spacing:.01em;padding:8pt 8pt 22pt !important}
+.hrbform .hbasis td.hb1{width:68%}
+.hrbform .hbasis td.hb2{width:32%;padding:0}
+.hrbform .hbasis td.hb2>.hlab{padding:4pt 6pt 0}
+.hrbform .hdate{padding:5pt 6pt 6pt;font-size:11pt}
+.hrbform .hdate.hlatest{border-top:1px solid #000}
+.hrbform .htitle{font-size:14pt;letter-spacing:.01em;padding:8pt 8pt 22pt !important;white-space:nowrap}
 .hrbform .hnum{font-weight:700;font-size:10.5pt;text-align:right;margin-bottom:8pt}
 .hrbform .hfiled{text-align:center;font-size:10.5pt;padding:4pt 6pt !important}
-.hrbform .hlab{font-size:10.5pt;margin-bottom:4pt}
+.hrbform .hlab{font-size:10.5pt;margin-bottom:4pt;white-space:nowrap}
 .hrbform .hval{font-size:11pt;line-height:1.3;word-break:break-word}
 .hrbform .hchk{margin:2pt 0}
 .hrbform .hbx{font-size:12pt;margin-right:6pt}
 .hrbform .hsec{font-size:11pt;margin-top:10pt;padding-bottom:2pt}
-.hrbform .hver{border-top:1px solid #000;padding-top:4pt;margin-top:12pt;padding-left:6pt}
 .hrbform .hintro{margin:4pt 0 6pt;font-size:11pt;line-height:1.35;text-align:left}
 .hrbform ol.hp{list-style:none;margin:0 0 6pt;padding:0 0 0 .35in}
-.hrbform ol.hp li{display:flex;gap:0;margin:0 0 4pt;line-height:1.35}
+.hrbform ol.hp li{display:flex;gap:0;margin:0 0 4pt;line-height:1.35;break-inside:avoid;page-break-inside:avoid}
 .hrbform ol.hp .hl{flex:0 0 .3in}
 .hrbform ol.hp .ht{flex:1;min-width:0}
 .hrbform ul.hvl{margin:4pt 0 6pt;padding-left:.45in}
 .hrbform ul.hvl li{margin:0 0 2pt;font-size:10.5pt;line-height:1.3}
-.hrbform .hbody{border-left:1px solid #000;border-bottom:1px solid #000;margin-top:-1px;padding:0 0 0 0}
-.hrbform .hbody>.hsec,.hrbform .hbody>.hintro,.hrbform .hbody>ol.hp,.hrbform .hbody>.hsig{padding-left:6pt;padding-right:6pt}
+/* the particulars box: left and bottom rules like the Bureau's form. If it runs onto a second page,
+   each page's part gets its own closing rule, so page 1 ends with a line and page 2 starts with one. */
+.hrbform .hbody{border-left:1px solid #000;border-top:1px solid #000;border-bottom:1px solid #000;margin-top:-1px;padding:0;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
+.hrbform .hbody>.hsec,.hrbform .hbody>.hintro,.hrbform .hbody>ol.hp{padding-left:6pt;padding-right:6pt}
 .hrbform .hbody>.hsec{margin-top:0;padding-top:6pt}
-.hrbform .hbody>.hver{padding-top:4pt;margin-top:8pt}
+.hrbform .hverwrap{border-top:1px solid #000;margin-top:8pt;break-inside:avoid;page-break-inside:avoid}
+.hrbform .hver{padding:4pt 6pt 0;margin-top:0}
 .hrbform .hrev{font-size:8pt;font-weight:700;margin-top:3pt}
-.hrbform .hsig{display:flex;gap:.4in;padding:10pt 6pt 6pt;font-size:11pt;margin-top:2pt}
+.hrbform .hsig{display:flex;gap:.4in;padding:12pt 6pt 6pt;font-size:11pt;margin-top:2pt}
 .hrbform .hsig>span{display:flex;align-items:flex-end;gap:4pt;flex:1}
 .hrbform .hsig>span:last-child{flex:0 0 2.3in}
 .hrbform .hline{flex:1;border-bottom:1px solid #000;height:12pt}
 .hrbform .hblank{color:#888;font-style:italic}
-@media print{.hrbform{max-width:none}.hrbform .hblank{color:#555}}
-@media(max-width:620px){.hrbform .hbasis td.hb1{width:58%}.hrbform .hbasis td.hb2{width:42%}.hrbform .hlab{word-break:normal;hyphens:none}.hrbform{font-size:9.5pt}.hrbform .hval,.hrbform .hintro{font-size:9.5pt}.hrbform .hlab,.hrbform .hfiled,.hrbform .hnum{font-size:8.5pt}.hrbform .htitle{font-size:11pt}}
+@media print{
+  .hrbform{max-width:none;page:hrbform}.hrbform .hblank{color:#555}
+  /* the Bureau's form runs nearly edge to edge: half-inch margins, no page number */
+  @page hrbform{size:letter;margin:.5in;@bottom-center{content:none}}
+}
+@media screen and (max-width:620px){.hrbform .hbasis td.hb1{width:58%}.hrbform .hbasis td.hb2{width:42%}.hrbform .hlab,.hrbform .htitle{white-space:normal;word-break:normal;overflow-wrap:normal;hyphens:none}.hrbform .hsec{font-size:9.5pt}.hrbform{font-size:9.5pt}.hrbform .hval,.hrbform .hintro,.hrbform .hdate{font-size:9.5pt}.hrbform .hlab,.hrbform .hfiled,.hrbform .hnum{font-size:8.5pt}.hrbform .htitle{font-size:10pt;padding:6pt 6pt 14pt !important}}
 
 .readpage .rp summary:before,.readpage .rp summary:after{display:none !important;content:none !important}
 
@@ -493,16 +503,49 @@ button.cwclaim.on{border-color:var(--navy);background:var(--tint);box-shadow:ins
 .rbmiss{margin-top:12px}
 
 /* ===== case packet ===== */
+.packet{font-family:'Times New Roman',Times,'Liberation Serif',serif;color:#111}
 .packet .pkcover{padding:30px 0 10px}
-.packet .pkcover h1{font-size:30px;margin:0 0 18px}
-.packet .pkline{font-size:15px;margin:0 0 6px}
-.packet .pkcover ol{font-size:15px;line-height:1.8}
+.packet .pkcover h1{font-size:30px;margin:0 0 6px;letter-spacing:.01em;padding-bottom:10px;border-bottom:3px double #111}
+.packet table.pkparties{width:auto;border-collapse:collapse;margin:16px 0 26px}
+.packet table.pkparties th{text-align:left;font-weight:700;font-size:15px;letter-spacing:0;text-transform:none;color:#111;
+  padding:5px 18px 5px 0;border:0;vertical-align:top;white-space:nowrap}
+.packet table.pkparties td{font-size:15px;padding:5px 0;border:0;vertical-align:top}
+.packet .pkcover h3{font-size:16px;margin:0 0 8px;color:#111;text-transform:uppercase;letter-spacing:.08em}
+.packet ol.pktoc{font-size:15px;line-height:1.9;margin:0;padding-left:22px}
 .packet .pksec{margin-top:28px}
-.packet .pksec h2{font-size:19px;margin:0 0 12px;color:#111}
-.packet pre.pkpre{white-space:pre-wrap;font-family:Georgia,'Iowan Old Style',Palatino,serif;font-size:13.5px;line-height:1.55;margin:0}
+.packet .pksec h2{font-size:19px;margin:0 0 14px;color:#111;padding-bottom:6px;border-bottom:1.5px solid #111}
+.packet .pksec h2 .pknum{color:#555}
+.packet table{border-collapse:collapse;width:100%;table-layout:auto}
+.packet th{font-family:Arial,Helvetica,sans-serif;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#444;
+  padding:0 7px 5px;border-bottom:1px solid #111;text-align:left;vertical-align:bottom}
+.packet td{padding:8px 7px;border-bottom:1px solid #ccc;vertical-align:top;font-size:14px;line-height:1.4}
+.packet td.n,.packet th:first-child{width:22px;padding-left:0;padding-right:4px}
+.packet td.n{color:#777;font-size:12px}
+.packet td.dcell{width:128px;font-size:13px;font-weight:700;color:#222;white-space:nowrap}
+.packet td.th{width:96px}.packet td.th img{max-width:84px;max-height:96px;border:1px solid #bbb;display:block}
+.packet td.loc{width:27%;font-size:12.5px;color:#444;overflow-wrap:anywhere}
+.packet .pk-chronology .wt{font-weight:400}
+.packet .pk-deadlines td.dcell{width:1%}
+.packet .wt{font-weight:700;margin:0 0 2px}
+.packet .dt{font-size:12px;color:#555;font-weight:700;margin-bottom:1px}
+.packet .pv{font-size:12.5px;color:#444;margin-top:3px}
+.packet pre.pkpre{white-space:pre-wrap;font-family:'Times New Roman',Times,serif;font-size:14px;line-height:1.55;margin:0}
+@media screen and (max-width:620px){
+  .packet td.dcell{white-space:normal;width:auto}
+}
 @media print{
-  .packet .pksec{page-break-before:always;margin-top:0}
-  .packet .pkcover{page-break-after:avoid}
+  .packet .pksec{page-break-before:always;break-before:page;margin-top:0}
+  .packet .pkcover{page-break-after:avoid;padding-top:0}
+  .packet .pksec h2{font-size:15pt}
+  .packet th{font-size:7.5pt}
+  .packet td{font-size:10.5pt;padding:6pt 5pt}
+  .packet td.dcell{font-size:10pt;width:1.15in}
+  .packet td.th{width:.95in}.packet td.th img{max-width:.85in;max-height:1.05in}
+  .packet td.loc{font-size:9pt}
+  .packet .pv,.packet .dt{font-size:9.5pt}
+  .packet td.n{font-size:9pt;width:.22in}
+  .packet thead{display:table-header-group}
+  .packet tr{break-inside:avoid;page-break-inside:avoid}
 }
 
 /* ===== home dashboard ===== */
