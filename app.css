@@ -769,3 +769,7 @@ button.dlink.dclose{justify-content:center;background:#f4f1fa;margin-top:14px;bo
 button.dlink{padding:9px 10px;margin:0;font-size:13.5px;border-radius:9px}
 button.dlink:active{background:var(--tint)}
 #moresheet{max-height:86vh;overflow-y:auto}
+
+/* temporary: formatting update notice */
+.updnote{background:#fff7e0;border:1px solid #f2b705;border-left:5px solid #f2b705;border-radius:10px;padding:10px 12px;margin:0 0 14px;font-size:14px;line-height:1.45;color:#3a2e00}
+@media print{.updnote{display:none !important}}

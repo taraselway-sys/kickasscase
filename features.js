@@ -878,6 +878,7 @@ function buildFurniture(){
     '<div id="dates-list"></div><div class="row" id="dt-all"><button class="pri" onclick="icsAll()">Add all upcoming dates to my calendar</button></div>');
   // case packet view
   addView('packet','Case packet','Everything in one printable file, numbered, with a contents page.',
+    '<div class="updnote" role="note"><b>We&rsquo;re updating this page to improve the formatting of the printed charge form and case packet.</b> Everything still works and your saved work is safe. Check back for updates.</div>'+
     '<div class="card"><h3 style="margin-top:0">What to include</h3><div id="pk-list"></div>'+
     '<div class="row"><button class="pri" onclick="buildPacket()">Build the case packet</button></div></div>'+
     '<div id="pk-print" class="printout" style="display:none"></div>');
