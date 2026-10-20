@@ -759,3 +759,13 @@ body.welcoming{overflow:hidden}
 @font-face{font-family:'Great Vibes';src:url('fonts/great-vibes.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
 #welcome .wmsg{margin:0 0 4px}
 #welcome .wsig{font-family:'Great Vibes','Snell Roundhand','Segoe Script',cursive;font-size:34px;line-height:1.1;color:var(--navy);margin:0 0 12px 2px}
+/* matching menus */
+button.dlink{display:flex;align-items:center;gap:11px}
+button.dlink .di{display:flex;width:20px;justify-content:center;color:var(--blue);flex:0 0 auto}
+button.dlink .di svg.ico{width:18px;height:18px}
+button.dlink.dclose{justify-content:center;background:#f4f1fa;margin-top:14px;border-radius:10px}
+.mgrp{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#8a6d1f;padding:9px 4px 3px;border-top:1px solid var(--line);margin-top:3px}
+.mh+.mgrp{border-top:0;margin-top:0}
+button.dlink{padding:9px 10px;margin:0;font-size:13.5px;border-radius:9px}
+button.dlink:active{background:var(--tint)}
+#moresheet{max-height:86vh;overflow-y:auto}

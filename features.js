@@ -775,6 +775,48 @@ function addView(id,title,sub,body){
   s.innerHTML='<h2>'+title+'</h2><p class="sub2">'+sub+'</p>'+body;
   var terms=$('v-terms'); terms.parentNode.insertBefore(s,terms);
 }
+/* ================= one menu, drawn twice: the top Contents menu and the bottom More sheet =================
+   Same groups, same order, same labels, same icons. Groups follow the Home page's kinds of case. */
+var GUIDE_PDF='https://drive.google.com/file/d/1lFgkhsHbcjSTJBwbAN3cjTMxqOnmTlSc/view', SHEETS_PDF='https://drive.google.com/file/d/14U_Z_6bzd-7tcaqbCF54knXmyo69tKLs/view';
+var MENU=[
+ ['Start here',[['home','Home'],['howto','How this works']]],
+ ['Build your case file',[['timeline','Chronology'],['exhibits','Evidence'],['witnesses','Witness list'],['docs','Correspondence and filings'],['records','Records requests'],['deadline','Deadline calculator'],['dates','Your deadlines'],['packet','Case packet']]],
+ ['Go to court',[['court','Court filings']]],
+ ['Family court',[['parenting','Parenting plan'],['decree','Divorce decree']]],
+ ['Human Rights Bureau',[['complaint','The complaint'],['stage','Where am I?'],['rebuttal','The rebuttal'],['damages','What you are owed'],['mediation','Mediation'],['nocause','If you get “no reasonable cause”']]],
+ ['Support',[['ai','Working with Claude'],['care','Looking after yourself'],['checklist','Progress checklist']]],
+ ['Your saved work',[['act:exportAll()','Back up my work','download'],['act:document.getElementById(\'imp\').click()','Restore from a backup','upload']]],
+ ['The full guide (Human Rights Bureau cases)',[['learn','Pro Se Power! — read the whole guide'],['url:'+GUIDE_PDF,'Pro Se Power! Guide & Workbook (PDF)','book-open'],['url:'+SHEETS_PDF,'Blank worksheets only (PDF)','file-text']]],
+ ['About',[['terms','Terms and disclaimer']]]];
+function menuAct(it,close){
+  var k=it[0];
+  if(k.indexOf('act:')===0) return close+k.slice(4);
+  if(k.indexOf('url:')===0) return close+"window.open('"+k.slice(4)+"','_blank','noopener')";
+  return "show('"+k+"')";
+}
+function menuIcon(it){ var k=it[0]; return it[2]? ico(it[2]) : (k.indexOf(':')<0? vico(k) : ''); }
+function buildMenus(){
+  if(!window.ico) return;
+  var drop=$('drop');
+  if(drop){
+    drop.querySelectorAll('.dgrp,.dlink').forEach(function(e){ e.remove(); });
+    var h='';
+    MENU.forEach(function(g){ h+='<div class="dgrp">'+esc(g[0])+'</div>'+g[1].map(function(it){
+      return '<button class="dlink" onclick="'+menuAct(it,'closeMenu();').replace(/"/g,'&quot;')+'"><span class="di">'+menuIcon(it)+'</span>'+esc(it[1])+(it[0].indexOf('url:')===0?' ↗':'')+'</button>'; }).join(''); });
+    h+='<button class="dlink dclose" onclick="closeMenu()">Close</button>';
+    drop.insertAdjacentHTML('beforeend',h);
+  }
+  var ms=$('moresheet');
+  if(ms){
+    var close=ms.querySelector('.moreclose');
+    ms.querySelectorAll('.morelink,.mgrp').forEach(function(e){ e.remove(); });
+    var m='';
+    MENU.forEach(function(g){ m+='<div class="mgrp">'+esc(g[0])+'</div>'+g[1].map(function(it){
+      return '<button class="morelink" onclick="'+menuAct(it,'closeMore();').replace(/"/g,'&quot;')+'"><span class="mi">'+menuIcon(it)+'</span>'+esc(it[1])+(it[0].indexOf('url:')===0?' ↗':'')+'</button>'; }).join(''); });
+    if(close) close.insertAdjacentHTML('beforebegin',m); else ms.insertAdjacentHTML('beforeend',m);
+  }
+}
+
 /* one icon set everywhere: the bottom bar and the More sheet use the same drawn icons as the pages */
 function swapNavIcons(){
   if(!window.vico) return;
@@ -931,7 +973,7 @@ function initFeatures(){
   if(window.initCourt) initCourt();
   if(window.initFamily) initFamily();
   if(window.initLimits) initLimits();
-  setTimeout(swapNavIcons,0);
+  setTimeout(function(){ buildMenus(); swapNavIcons(); },0);
   showWelcome();
   buildFurniture();
   layoutAllPages();
