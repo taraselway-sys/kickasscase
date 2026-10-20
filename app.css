@@ -279,7 +279,7 @@ border-bottom:1.5px solid #333;padding:6px 7px}
 .pvdoc td.dcell{width:92px;font-size:12.5px;font-weight:700;color:#333}
 .pvdoc .pvnote{font-size:13px;color:#555;margin:0 0 16px;padding:8px 10px;background:#f2f2f2;border-radius:5px}
 .pvdoc td.loc{width:34%;font-size:12.5px;color:#444;word-break:break-word}
-@media(max-width:620px){
+@media screen and (max-width:620px){
   .pvdoc table,.pvdoc thead,.pvdoc tbody,.pvdoc tr,.pvdoc td{display:block;width:auto}
   .pvdoc thead{display:none}
   .pvdoc tr{border-bottom:1px solid #ddd;padding:12px 0;display:flex;flex-wrap:wrap;gap:0 12px;align-items:flex-start}
@@ -343,7 +343,10 @@ body.printframe .printframe-body{max-width:none}
 /* ---- the charge form, laid out like the Bureau's own ---- */
 .hrbform{font-family:'Times New Roman',Times,'Liberation Serif',serif;color:#000;background:#fff;font-size:11pt;line-height:1.3;max-width:7.5in;margin:0 auto}
 .hrbform table.hgrid{width:100%;border-collapse:collapse;table-layout:fixed}
-.hrbform .hgrid td{border:1px solid #000;vertical-align:top;padding:4pt 6pt 6pt}
+/* the form's grid is always a real table, never the stacked phone layout other printouts use */
+.hrbform table.hgrid{display:table !important}.hrbform .hgrid tbody{display:table-row-group !important}.hrbform .hgrid tr{display:table-row !important;border:0 !important;padding:0 !important}.hrbform .hgrid td{display:table-cell !important;order:0 !important;margin:0 !important}
+.hrbform .hgrid td{border:1px solid #000;vertical-align:top;padding:4pt 6pt 6pt;word-break:normal;overflow-wrap:normal;hyphens:none}
+.hrbform .hgrid td .hval{overflow-wrap:break-word}
 .hrbform .hgrid td.hc1{width:44%}
 .hrbform .hgrid td.hc2{width:56%}
 .hrbform .hbasis{margin-top:-1px}
@@ -352,10 +355,13 @@ body.printframe .printframe-body{max-width:none}
 .hrbform .hbasis td.hb2>.hlab{padding:4pt 6pt 0}
 .hrbform .hdate{padding:5pt 6pt 6pt;font-size:11pt}
 .hrbform .hdate.hlatest{border-top:1px solid #000}
-.hrbform .htitle{font-size:14pt;letter-spacing:.01em;padding:8pt 8pt 22pt !important;white-space:nowrap}
+.hrbform .htitle{font-size:14pt;letter-spacing:.01em;padding:8pt 8pt 22pt !important}
 .hrbform .hnum{font-weight:700;font-size:10.5pt;text-align:right;margin-bottom:8pt}
 .hrbform .hfiled{text-align:center;font-size:10.5pt;padding:4pt 6pt !important}
-.hrbform .hlab{font-size:10.5pt;margin-bottom:4pt;white-space:nowrap}
+.hrbform .hlab{font-size:10.5pt;margin-bottom:4pt}
+@media (min-width:700px){.hrbform .hlab,.hrbform .htitle{white-space:nowrap}}
+/* printing from a phone: the page is laid out narrow, so the form's type steps down to keep words whole */
+@media print and (max-width:620px){.hrbform{font-size:9.5pt}.hrbform .hval,.hrbform .hintro,.hrbform .hdate,.hrbform .hsec{font-size:9.5pt}.hrbform .hlab,.hrbform .hfiled,.hrbform .hnum,.hrbform ul.hvl li{font-size:8.5pt}.hrbform .htitle{font-size:11pt;padding:6pt 6pt 14pt !important}.hrbform ol.hp{padding-left:.15in}}
 .hrbform .hval{font-size:11pt;line-height:1.3;word-break:break-word}
 .hrbform .hchk{margin:2pt 0}
 .hrbform .hbx{font-size:12pt;margin-right:6pt}
