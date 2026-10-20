@@ -744,3 +744,18 @@ h2.homeh2{margin:0 0 12px;font-size:22px;color:var(--navy)}
 .homekick{margin:24px 0 4px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
 
 .herobadges{margin-bottom:2px}
+/* welcome pop-up */
+#welcome{position:fixed;inset:0;z-index:9000;background:rgba(10,22,40,.62);display:flex;align-items:center;justify-content:center;padding:16px;animation:wfade .2s ease}
+#welcome .wbox{background:#fff;border-radius:18px;max-width:420px;width:100%;padding:22px 20px 18px;border-top:5px solid #f2b705;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+#welcome h2{margin:0 0 8px;font-family:Georgia,'Iowan Old Style',Palatino,serif;font-style:italic;font-size:26px;color:var(--navy)}
+#welcome p{margin:0 0 12px;font-size:15.5px;line-height:1.55;color:var(--ink)}
+#welcome .wsocial{background:#fbf6e6;border:1px solid #ecdcae;border-left:4px solid #f2b705;border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:14.5px;line-height:1.5}
+#welcome .wfine{font-size:13px;color:var(--mut)}
+#welcome .wlink{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--blue);text-decoration:underline;cursor:pointer}
+#welcome .wgo{width:100%}
+body.welcoming{overflow:hidden}
+@keyframes wfade{from{opacity:0}to{opacity:1}}
+@media print{#welcome{display:none !important}}
+@font-face{font-family:'Great Vibes';src:url('fonts/great-vibes.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+#welcome .wmsg{margin:0 0 4px}
+#welcome .wsig{font-family:'Great Vibes','Snell Roundhand','Segoe Script',cursive;font-size:34px;line-height:1.1;color:var(--navy);margin:0 0 12px 2px}

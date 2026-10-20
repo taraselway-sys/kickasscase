@@ -906,6 +906,25 @@ function layoutPage(v){
 function layoutAllPages(){ document.querySelectorAll('section.view').forEach(function(v){ if(v.id!=='v-home') layoutPage(v); }); }
 
 /* ================= start-up ================= */
+/* ================= welcome, shown every time the app opens ================= */
+function inSocialBrowser(){ return /FBAN|FBAV|FB_IAB|FBIOS|Instagram/i.test(navigator.userAgent||''); }
+function showWelcome(){
+  if($('welcome')) return;
+  var ig=/Instagram/i.test(navigator.userAgent||'');
+  var w=document.createElement('div'); w.id='welcome'; w.setAttribute('role','dialog'); w.setAttribute('aria-modal','true'); w.setAttribute('aria-labelledby','welcome-h');
+  w.innerHTML='<div class="wbox">'+
+    '<h2 id="welcome-h">Welcome.</h2>'+
+    '<p class="wmsg">You\u2019re not doing this alone anymore. Everything here is free, and everything you type stays on your device. Now let\u2019s kick some ass.</p>'+
+    '<p class="wsig">\u2013Tara</p>'+
+    (inSocialBrowser()?'<div class="wsocial"><b>You’re in '+(ig?'Instagram':'Facebook')+'’s browser.</b> Your work may not be saved here. Tap ••• and choose <b>Open in browser</b>.</div>':'')+
+    '<p class="wfine"><button type="button" class="wlink" onclick="closeWelcome();show(\'terms\')">Read the terms and disclaimer</button></p>'+
+    '<button type="button" class="pri wgo" onclick="closeWelcome()">Let’s get started</button></div>';
+  document.body.appendChild(w); document.body.classList.add('welcoming');
+  setTimeout(function(){ var b=w.querySelector('.wgo'); if(b) try{ b.focus(); }catch(e){} },50);
+}
+function closeWelcome(){ var w=$('welcome'); if(w) w.remove(); document.body.classList.remove('welcoming'); }
+document.addEventListener('keydown',function(e){ if(e.key==='Escape' && $('welcome')) closeWelcome(); });
+
 function initFeatures(){
   if(ensureIds()) save();
   window.iosTip=function(){ renderInstall(); };   // the install card replaces the older tip
@@ -913,6 +932,7 @@ function initFeatures(){
   if(window.initFamily) initFamily();
   if(window.initLimits) initLimits();
   setTimeout(swapNavIcons,0);
+  showWelcome();
   buildFurniture();
   layoutAllPages();
   // show() also refreshes the new pages
