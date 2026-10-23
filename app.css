@@ -61,6 +61,29 @@ button.danger{background:#fff;color:#a4262c;border:1px solid #f0d4d6}
 img.exthumb{float:right;width:62px;height:62px;object-fit:cover;border-radius:7px;border:1px solid var(--line);margin:0 0 8px 10px}
 #ex-thumbprev{margin-top:10px;display:flex;align-items:center}
 #ex-thumbprev img{width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.attprev{margin-top:10px;display:flex;align-items:center}
+.attprev:empty,#ex-thumbprev:empty{display:none}
+.attname{font-size:13.5px;color:var(--muted,#555);margin-left:10px;word-break:break-word}
+.attnote{margin:6px 0 0;font-size:12.5px}
+.pdftile{display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#b3261e;font:800 15px/1 inherit;letter-spacing:.04em;flex:none}
+.item .pdftile.exthumb{float:right;width:62px;height:62px;margin:0 0 8px 10px}
+button.evview{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:7px 11px;font-size:13px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--navy);cursor:pointer;font-weight:700}
+.item .exthumb[role=button]{cursor:zoom-in}
+#evv{position:fixed;inset:0;z-index:9000;background:rgba(10,14,24,.88);display:none;flex-direction:column;align-items:center;padding:14px 12px 18px;overflow:auto;-webkit-overflow-scrolling:touch}
+#evv.on{display:flex}
+#evv .evvbar{width:100%;max-width:880px;display:flex;align-items:center;gap:10px;margin-bottom:10px;color:#fff}
+#evv .evvttl{flex:1;font-weight:700;font-size:15px;line-height:1.3;min-width:0}
+#evv .evvttl small{display:block;font-weight:400;opacity:.78;font-size:12.5px;margin-top:2px}
+#evv a.evvpdf{background:#fff;color:#111;border-radius:9px;padding:9px 13px;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap}
+#evv a.evvpdf[hidden]{display:none}
+#evv button.evvx{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:9px;font-size:18px;padding:6px 12px;cursor:pointer}
+#evv .evvbody{width:100%;max-width:880px}
+#evv .evvbody img{display:block;width:100%;height:auto;background:#fff;border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#evv .evvbody iframe{display:block;width:100%;height:calc(100vh - 110px);border:0;background:#fff;border-radius:6px}
+#evv .pdfpages{display:flex;flex-direction:column;gap:12px}
+#evv canvas.pdfpage{display:block;width:100%;height:auto;background:#fff;border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#evv .evvmsg{background:#fff;color:#222;border-radius:10px;padding:18px;font-size:15px;line-height:1.5}
+@media print{#evv{display:none !important}}
 input[type=file]{font-size:14px;padding:9px 0;border:0;width:100%}
 .chk{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer}
 .chk:last-child{border-bottom:0}

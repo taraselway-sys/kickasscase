@@ -141,26 +141,6 @@ function showTextFallback(text, label){
 
 /* ---- exhibits ---- */
 var pendingThumb=null;
-function pickThumb(ev){
-  var f=ev.target.files[0]; if(!f) return;
-  if(!/^image\//.test(f.type)){ alert('That is not an image. A thumbnail is optional \u2014 you can leave it blank.'); ev.target.value=''; return; }
-  var r=new FileReader();
-  r.onload=function(){
-    var img=new Image();
-    img.onload=function(){
-      var max=260, w=img.width, h=img.height;
-      if(w>h){ if(w>max){ h=Math.round(h*max/w); w=max; } } else { if(h>max){ w=Math.round(w*max/h); h=max; } }
-      var c=document.createElement('canvas'); c.width=w; c.height=h;
-      c.getContext('2d').drawImage(img,0,0,w,h);
-      pendingThumb=c.toDataURL('image/jpeg',0.6);
-      $('ex-thumbprev').innerHTML='<img src="'+pendingThumb+'" alt="preview"><button class="sec" style="padding:7px 11px;font-size:12.5px;margin-left:10px" onclick="clearThumb()">Remove</button>';
-      if(!$('ex-file').value) $('ex-file').value=f.name;
-    };
-    img.src=r.result;
-  };
-  r.readAsDataURL(f);
-}
-function clearThumb(){ pendingThumb=null; $('ex-thumbprev').innerHTML=''; $('ex-img').value=''; }
 
 /* the page's own styles as text, for printouts built in a separate frame or window */
 function pageCSS(){

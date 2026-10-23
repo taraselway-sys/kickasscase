@@ -26,6 +26,7 @@ function chipBtn(label,on,click,extra){
 }
 function flashEl(el){ if(!el) return; try{ el.scrollIntoView({block:'center'}); }catch(e){ el.scrollIntoView(); }
   el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); }
+function viewOrGo(view,id){ if(hasDoc(view,id) && openEvidence(view,id)) return; goItem(view,id); }
 function goItem(view,id){ show(view); setTimeout(function(){ flashEl(document.querySelector('[data-id="'+id+'"]')); },80); }
 
 /* ================= claims and tags ================= */
@@ -74,19 +75,21 @@ function editItem(list,id){
   var x=byId(D[list],id); if(!x) return;
   var F=LISTS[list].fields; for(var k in F){ var el=$(F[k]); if(el) el.value=x[k]||(el.tagName==='SELECT'?el.options[0].value:''); }
   if(list==='events'){ FORM_EV={ex:(x.ex||[]).slice(),wt:(x.wt||[]).slice(),tags:(x.tags||[]).slice(),pa:!!x.pa}; renderEvLinks(); }
-  if(list==='exhibits'){ pendingThumb=x.t||null; $('ex-thumbprev').innerHTML= x.t? '<img src="'+x.t+'" alt="preview"><button class="sec" style="padding:7px 11px;font-size:12.5px;margin-left:10px" onclick="clearThumb()">Remove</button>':''; }
+  if(list==='exhibits'){ resetAtt('exhibits'); pendingThumb=x.t||null; attPreview('exhibits',x.t||'',x.v,x.vn); }
+  if(list==='docs'){ resetAtt('docs'); attPreview('docs','',x.v,x.vn); }
   setEditMode(list,id);
   var first=$(F[Object.keys(F)[0]]); if(first){ try{ first.scrollIntoView({block:'center'}); }catch(e){} first.focus(); }
 }
 function cancelEdit(list){
   clearForm(list); setEditMode(list,null);
   if(list==='events'){ FORM_EV=blankEvLinks(); renderEvLinks(); }
-  if(list==='exhibits') clearThumb();
+  if(list==='exhibits'||list==='docs') resetAtt(list);
 }
 function removeItem(list,id,msg,render){
   if(!confirm(msg)) return;
   var i=idxOf(D[list],id); if(i<0) return;
-  D[list].splice(i,1);
+  var gone=D[list][i]; D[list].splice(i,1);
+  if(gone && gone.v) docDel(id);
   // drop links that pointed at it
   if(list==='exhibits'||list==='witnesses'){ var key=list==='exhibits'?'ex':'wt';
     D.events.forEach(function(e){ if(e[key]) e[key]=e[key].filter(function(z){return z!==id;}); });
@@ -140,7 +143,7 @@ function evChips(e){
   var h='';
   if(e.pa) h+='<span class="tag pa">Protected activity</span>';
   (e.tags||[]).forEach(function(t){ h+='<span class="tag">'+esc(claimName(t))+'</span>'; });
-  linkedExhibits(e).forEach(function(x){ h+='<button type="button" class="lchip" onclick="goItem(\'exhibits\',\''+x.id+'\')">Exhibit '+x.n+'</button>'; });
+  linkedExhibits(e).forEach(function(x){ h+='<button type="button" class="lchip" onclick="viewOrGo(\'exhibits\',\''+x.id+'\')">Exhibit '+x.n+'</button>'; });
   linkedWitnesses(e).forEach(function(x){ h+='<button type="button" class="lchip w" onclick="goItem(\'witnesses\',\''+x.id+'\')">'+esc(short(x.n,30))+'</button>'; });
   return h? '<div class="chips">'+h+'</div>' : '';
 }
@@ -203,7 +206,8 @@ function addExhibit(){
   var id=EDITING.exhibits, x;
   if(id){ x=byId(D.exhibits,id); if(x) Object.assign(x,o); }
   else { o.id=uid(); D.exhibits.push(o); x=o; id=o.id; }
-  clearForm('exhibits'); clearThumb(); setEditMode('exhibits',null);
+  applyAtt('exhibits',x);
+  clearForm('exhibits'); resetAtt('exhibits'); setEditMode('exhibits',null);
   if(!save()){ if(x && x.t){ x.t=''; if(save()) alert('Storage on this device is full, so the thumbnail could not be kept. The exhibit was saved without it.'); } }
   renderExhibits(); renderEvents();
   setTimeout(function(){ flashEl(document.querySelector('#ex-list [data-id="'+id+'"]')); },60);
@@ -226,13 +230,14 @@ function renderExhibits(){
     var mv='<button type="button" class="ilink" title="Move up" aria-label="Move up" onclick="moveExhibit(\''+e.id+'\',-1)"'+(i===0?' disabled':'')+'>\u2191</button>'+
            '<button type="button" class="ilink" title="Move down" aria-label="Move down" onclick="moveExhibit(\''+e.id+'\',1)"'+(i===D.exhibits.length-1?' disabled':'')+'>\u2193</button>';
     h+='<div class="item" data-id="'+e.id+'">'+itemTools('exhibits',e.id,'Remove this exhibit?','renderExhibits',mv)+
-       (e.t?'<img class="exthumb" src="'+e.t+'" alt="">':'')+
+       (e.t?'<img class="exthumb" src="'+e.t+'" alt="">':(e.v==='pdf'?'<span class="pdftile exthumb">PDF</span>':''))+
        '<div class="d">Exhibit '+(i+1)+(e.d?' \u00b7 '+esc(niceDate(e.d)):'')+'</div><div class="t">'+esc(e.w)+'</div>'+
        (e.f?'<div class="m"><b>File:</b> '+esc(e.f)+'</div>':'')+
        (e.p?'<div class="m"><b>Proves:</b> '+esc(e.p)+'</div>':'')+
        (e.l?'<div class="m"><b>Stored:</b> '+esc(e.l)+'</div>':'')+backlinks(e.id,'ex')+'</div>';
   });
   $('ex-list').innerHTML=h; $('ex-count').textContent=D.exhibits.length;
+  decorateDocs('ex-list','exhibits');
 }
 
 /* ================= witnesses ================= */
@@ -262,8 +267,10 @@ function renderWitnesses(){
 function addDoc(){
   var o=readForm('docs'); if(!o.w){ alert('Say what the document is.'); return; }
   var id=EDITING.docs;
-  if(id){ var x=byId(D.docs,id); if(x) Object.assign(x,o); }
-  else { o.id=uid(); D.docs.push(o); id=o.id; }
+  var x;
+  if(id){ x=byId(D.docs,id); if(x) Object.assign(x,o); }
+  else { o.id=uid(); D.docs.push(o); x=o; id=o.id; }
+  applyAtt('docs',x); resetAtt('docs');
   D.docs.sort(function(a,b){ return (a.d||'9999')<(b.d||'9999')?-1:1; });
   clearForm('docs'); setEditMode('docs',null);
   save(); renderDocs(); renderHomeDates();
@@ -284,6 +291,194 @@ function renderDocs(){
        (e.l?'<div class="m"><b>Stored:</b> '+esc(e.l)+'</div>':'')+'</div>';
   });
   $('dc-list').innerHTML=h; $('dc-count').textContent=D.docs.length; $('dc-open').textContent=open;
+  decorateDocs('dc-list','docs');
+}
+
+/* ================= attached documents and the preview ================= */
+/* The full document lives in IndexedDB under "doc:<id>", apart from the case file,
+   so saving stays fast and backups stay small. The record keeps v ('image'|'pdf') and vn (file name). */
+var PEND={};   // per list: undefined = no change, 'remove', or {blob,kind,name}
+var ATT_MAX=15*1024*1024;
+function docKey(id){ return 'doc:'+id; }
+function docPut(id,blob){ return idbDo('readwrite',function(st){ return st.put(blob,docKey(id)); }); }
+function docGet(id){ return idbDo('readonly',function(st){ return st.get(docKey(id)); }); }
+function docDel(id){ return idbDo('readwrite',function(st){ return st.delete(docKey(id)); }); }
+function attBox(list){ return $(list==='exhibits'?'ex-thumbprev':'dc-attprev'); }
+function attInput(list){ return $(list==='exhibits'?'ex-img':'dc-img'); }
+function attPreview(list,thumb,kind,name){
+  var box=attBox(list); if(!box) return;
+  if(!thumb && !kind){ box.innerHTML=''; return; }
+  var pic= thumb? '<img src="'+thumb+'" alt="preview">' : (kind==='pdf'? '<span class="pdftile">PDF</span>' : '');
+  box.innerHTML=pic+(name?'<span class="attname">'+esc(name)+'</span>':'')+
+    '<button class="sec" type="button" style="padding:7px 11px;font-size:12.5px;margin-left:10px" onclick="clearAtt(\''+list+'\')">Remove</button>';
+}
+function resetAtt(list){ PEND[list]=undefined; var b=attBox(list); if(b) b.innerHTML=''; var i=attInput(list); if(i) i.value=''; if(list==='exhibits') pendingThumb=null; }
+function clearAtt(list){ resetAtt(list); PEND[list]='remove'; }
+function clearThumb(){ clearAtt('exhibits'); }
+function pickDoc(list,ev){
+  var f=ev.target.files[0]; if(!f) return;
+  var isImg=/^image\//.test(f.type), isPdf=f.type==='application/pdf'||/\.pdf$/i.test(f.name);
+  if(!isImg && !isPdf){ alert('That file is not a photo, screenshot or PDF. Attaching a document is optional \u2014 you can leave it blank.'); ev.target.value=''; return; }
+  if(f.size>ATT_MAX){ alert('That file is larger than 15 MB. Keep it in your Drive and log it here without attaching it.'); ev.target.value=''; return; }
+  if(!IDB){ alert('This browser cannot keep documents, so only the details will be saved. Keep the file in your Drive.'); ev.target.value=''; return; }
+  var fileEl= list==='exhibits'? $('ex-file') : null;
+  if(fileEl && !fileEl.value) fileEl.value=f.name;
+  if(isPdf){
+    PEND[list]={blob:f,kind:'pdf',name:f.name};
+    if(list==='exhibits') pendingThumb=null;
+    attPreview(list,'','pdf',f.name);
+    pdfThumb(f).then(function(t){ if(t && PEND[list] && PEND[list].blob===f){ if(list==='exhibits') pendingThumb=t; attPreview(list,t,'pdf',f.name); } });
+    return;
+  }
+  var r=new FileReader();
+  r.onload=function(){
+    var img=new Image();
+    img.onload=function(){
+      function scaled(max,q,cb){
+        var w=img.width,h=img.height,k=Math.min(1,max/Math.max(w,h)); w=Math.max(1,Math.round(w*k)); h=Math.max(1,Math.round(h*k));
+        var c=document.createElement('canvas'); c.width=w; c.height=h; var g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,w,h); g.drawImage(img,0,0,w,h);
+        return cb? c.toBlob(cb,'image/jpeg',q) : c.toDataURL('image/jpeg',q);
+      }
+      var thumb=scaled(260,0.6);
+      if(list==='exhibits') pendingThumb=thumb;
+      scaled(2400,0.86,function(blob){
+        PEND[list]={blob:blob||f,kind:'image',name:f.name};
+        attPreview(list,thumb,'image',f.name);
+      });
+    };
+    img.onerror=function(){ alert('That image could not be read. Try a different file.'); ev.target.value=''; };
+    img.src=r.result;
+  };
+  r.readAsDataURL(f);
+}
+function applyAtt(list,x){
+  var p=PEND[list]; if(!x || p===undefined) return;
+  if(p==='remove'){ if(x.v) docDel(x.id); delete x.v; delete x.vn; return; }
+  x.v=p.kind; x.vn=p.name;
+  var id=x.id;
+  docPut(id,p.blob).then(function(ok){ if(!ok){ var y=byId(D[list],id); if(y){ delete y.v; delete y.vn; save(); if(list==='exhibits') renderExhibits(); else renderDocs(); }
+    alert('There was not enough room in this browser to keep the document. The details were saved without it.'); } });
+}
+function hasDoc(list,id){
+  var x=byId(D[list]||[],id); if(!x) return false;
+  if(window.evidenceStatic && window.evidenceStatic(list,id)) return true;
+  return !!x.v;
+}
+function decorateDocs(listId,list){
+  var el=$(listId); if(!el) return;
+  el.querySelectorAll('.item[data-id]').forEach(function(it){
+    var id=it.getAttribute('data-id'); if(!hasDoc(list,id) || it.querySelector('.evview')) return;
+    var b=document.createElement('button'); b.type='button'; b.className='evview'; b.textContent='View document';
+    b.onclick=function(){ openEvidence(list,id); };
+    var t=it.querySelector('.t'); if(t && t.nextSibling) it.insertBefore(b,t.nextSibling); else it.appendChild(b);
+    var th=it.querySelector('.exthumb'); if(th){ th.setAttribute('role','button'); th.setAttribute('tabindex','0'); th.setAttribute('aria-label','View document');
+      th.onclick=function(){ openEvidence(list,id); }; th.onkeydown=function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openEvidence(list,id); } }; }
+  });
+}
+var EVV={url:null,last:null};
+function evvShow(head,sub){
+  var box=$('evv'); $('evv-t').innerHTML=esc(head)+(sub?'<small>'+esc(sub)+'</small>':'');
+  EVV.last=document.activeElement; box.classList.add('on'); document.body.style.overflow='hidden';
+  try{ $('evv-x').focus(); }catch(e){}
+}
+function openEvidence(list,id){
+  var x=byId(D[list]||[],id); if(!x||!$('evv')) return false;
+  var head= list==='exhibits'? 'Exhibit '+exNum(id) : 'Document', body=$('evv-body'), pdf=$('evv-pdf');
+  var st= window.evidenceStatic && window.evidenceStatic(list,id);
+  if(st){
+    body.innerHTML='<img alt="">'; body.firstChild.src=st.img; body.firstChild.alt=x.w||head;
+    if(st.pdf){ pdf.href=st.pdf; pdf.hidden=false; } else pdf.hidden=true;
+    evvShow(head,x.w); return true;
+  }
+  if(!x.v) return false;
+  body.innerHTML='<div class="evvmsg">Opening\u2026</div>'; pdf.hidden=true; evvShow(head,x.w);
+  docGet(id).then(function(blob){
+    if(!$('evv').classList.contains('on')) return;
+    if(!blob){ body.innerHTML='<div class="evvmsg">This document is not saved in this browser. It stays on the device where it was attached. The original should be in your Drive'+(x.l?' ('+esc(x.l)+')':'')+'.</div>'; return; }
+    if(EVV.url) URL.revokeObjectURL(EVV.url);
+    EVV.url=URL.createObjectURL(blob);
+    if(x.v==='pdf'){
+      pdf.href=EVV.url; pdf.hidden=false; pdf.setAttribute('download',x.vn||'document.pdf');
+      var url=EVV.url;
+      renderPdf(blob,body).catch(function(){
+        if(EVV.url!==url) return;
+        body.innerHTML='<iframe title="'+esc(x.w||head)+'"></iframe>'; body.firstChild.src=url;
+      });
+    } else {
+      body.innerHTML='<img alt="">'; body.firstChild.src=EVV.url; body.firstChild.alt=x.w||head;
+    }
+  });
+  return true;
+}
+/* PDF.js (Apache 2.0, in vendor/pdfjs) draws PDFs on every phone and browser. It loads only when a PDF is opened. */
+var PDFJS_V='3.11.174', pdfjsP=null;
+function loadPdfJs(){
+  if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if(pdfjsP) return pdfjsP;
+  pdfjsP=new Promise(function(res,rej){
+    var s=document.createElement('script'); s.src='vendor/pdfjs/pdf.min.js?v='+PDFJS_V; s.async=true;
+    s.onload=function(){ if(!window.pdfjsLib) return rej(); window.pdfjsLib.GlobalWorkerOptions.workerSrc='vendor/pdfjs/pdf.worker.min.js?v='+PDFJS_V; res(window.pdfjsLib); };
+    s.onerror=function(){ pdfjsP=null; rej(); };
+    document.head.appendChild(s);
+  });
+  return pdfjsP;
+}
+function pdfOpen(blob){
+  return Promise.all([loadPdfJs(), blob.arrayBuffer()]).then(function(r){
+    return r[0].getDocument({data:new Uint8Array(r[1]), isEvalSupported:false}).promise;
+  });
+}
+function pdfPageCanvas(doc,n,width){
+  return doc.getPage(n).then(function(pg){
+    var v1=pg.getViewport({scale:1}), k=width/v1.width, vp=pg.getViewport({scale:k});
+    var c=document.createElement('canvas'); c.width=Math.ceil(vp.width); c.height=Math.ceil(vp.height);
+    var g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height);
+    return pg.render({canvasContext:g, viewport:vp}).promise.then(function(){ return c; });
+  });
+}
+function pdfThumb(blob){
+  return pdfOpen(blob).then(function(doc){ return pdfPageCanvas(doc,1,260).then(function(c){ var u=c.toDataURL('image/jpeg',0.6); try{ doc.destroy(); }catch(e){} return u; }); }).catch(function(){ return null; });
+}
+var PDF_MAXPAGES=40;
+function renderPdf(blob,body){
+  var token=EVV.url;
+  return pdfOpen(blob).then(function(doc){
+    if(EVV.url!==token) return;
+    body.innerHTML='<div class="pdfpages"></div>'; var wrap=body.firstChild;
+    var px=Math.min(1800, Math.round((body.clientWidth||800)*Math.min(2,window.devicePixelRatio||1)));
+    var n=Math.min(doc.numPages,PDF_MAXPAGES), i=0;
+    function next(){
+      if(EVV.url!==token){ try{ doc.destroy(); }catch(e){} return; }
+      if(++i>n){ if(doc.numPages>n){ var m=document.createElement('div'); m.className='evvmsg'; m.textContent='Showing the first '+n+' of '+doc.numPages+' pages. Use Open PDF to read the rest.'; wrap.appendChild(m); } return; }
+      return pdfPageCanvas(doc,i,px).then(function(c){ c.className='pdfpage'; c.setAttribute('aria-label','Page '+i); wrap.appendChild(c); return next(); });
+    }
+    return next();
+  });
+}
+function closeEvidence(){
+  var box=$('evv'); if(!box||!box.classList.contains('on')) return;
+  box.classList.remove('on'); $('evv-body').innerHTML=''; document.body.style.overflow='';
+  var pdf=$('evv-pdf'); pdf.removeAttribute('download'); pdf.removeAttribute('href');
+  if(EVV.url){ URL.revokeObjectURL(EVV.url); EVV.url=null; }
+  if(EVV.last && EVV.last.focus) try{ EVV.last.focus(); }catch(e){}
+}
+function initEvidenceViewer(){
+  var box=$('evv'); if(!box) return;
+  $('evv-x').onclick=closeEvidence;
+  box.addEventListener('click',function(e){ if(e.target===box||e.target.id==='evv-body') closeEvidence(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeEvidence(); });
+  setTimeout(sweepDocs,4000);
+}
+/* Remove stored documents nothing points to any more (after a reset, or a restore from another device). */
+function sweepDocs(){
+  if(!IDB) return;
+  idbChain.then(function(){ return idbGet(); }).then(function(rec){
+    var keep={}; function mark(o){ ['exhibits','docs'].forEach(function(k){ ((o&&o[k])||[]).forEach(function(x){ if(x&&x.id&&x.v) keep[docKey(x.id)]=1; }); }); }
+    mark(D); try{ mark(rec?JSON.parse(rec):null); }catch(e){ return; }
+    return idbDo('readonly',function(st){ return st.getAllKeys? st.getAllKeys() : null; }).then(function(keys){
+      (keys||[]).forEach(function(k){ if(typeof k==='string' && k.indexOf('doc:')===0 && !keep[k]) idbDo('readwrite',function(st){ return st.delete(k); }); });
+    });
+  }).catch(function(){});
 }
 
 /* ================= deadlines ================= */
@@ -979,6 +1174,7 @@ function initFeatures(){
   showWelcome();
   buildFurniture();
   layoutAllPages();
+  initEvidenceViewer();
   // show() also refreshes the new pages
   var _show=show;
   window.show=function(id){ _show(id);

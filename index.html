@@ -377,8 +377,9 @@ so nothing will work until it runs.</div></noscript>
  <textarea id="ex-proves" placeholder="One sentence. If you cannot say what it proves, it may not be an exhibit yet."></textarea>
  <label class="fl" for="ex-file">File name</label><input type="text" id="ex-file" placeholder="2026-04-08-adams-post.png">
  <label class="fl" for="ex-where">Where it is stored</label><input type="text" id="ex-where" placeholder="Drive folder">
- <label class="fl" for="ex-img">Thumbnail (optional)</label>
- <input type="file" id="ex-img" accept="image/*" onchange="pickThumb(event)">
+ <label class="fl" for="ex-img">Attach the document (optional)</label>
+ <input type="file" id="ex-img" accept="image/*,application/pdf" onchange="pickDoc('exhibits',event)">
+ <p class="note attnote">A photo, screenshot or PDF, up to 15 MB. The full document is kept only in this browser on this device, so you can open it here. It is not part of your backup file. Keep the original in your Drive.</p>
  <div id="ex-thumbprev"></div>
  <div class="row"><button class="pri" onclick="addExhibit()">Add exhibit</button><span class="saved">Saved</span></div></div>
  <div class="card"><h3 style="margin-top:0">Export the index</h3>
@@ -551,6 +552,10 @@ so nothing will work until it runs.</div></noscript>
  <label class="fl" for="dc-action">Action needed</label><input type="text" id="dc-action" placeholder="Reply, appeal, provide documents…">
  <label class="fl" for="dc-due">Due by</label><input type="date" id="dc-due">
  <label class="fl" for="dc-where">Where it is stored</label><input type="text" id="dc-where" placeholder="Drive folder and file name">
+ <label class="fl" for="dc-img">Attach the document (optional)</label>
+ <input type="file" id="dc-img" accept="image/*,application/pdf" onchange="pickDoc('docs',event)">
+ <p class="note attnote">A photo, screenshot or PDF, up to 15 MB. The full document is kept only in this browser on this device, so you can open it here. It is not part of your backup file. Keep the original in your Drive.</p>
+ <div id="dc-attprev" class="attprev"></div>
  <div class="row"><button class="pri" onclick="addDoc()">File it</button><span class="saved">Saved</span></div></div>
  <div class="card"><h3 style="margin-top:0">Print or export</h3>
  <p class="note">A dated log of every letter in and out, with the deadlines attached to each.</p>
@@ -1442,4 +1447,5 @@ To the fullest extent permitted by law, no liability is accepted for any loss ar
 <script src="court.js?v=__V__"></script>
 <script src="family.js?v=__V__"></script>
 <script src="limits.js?v=__V__"></script>
+<div id="evv" role="dialog" aria-modal="true" aria-label="Document preview"><div class="evvbar"><div class="evvttl" id="evv-t"></div><a class="evvpdf" id="evv-pdf" target="_blank" rel="noopener">Open PDF</a><button type="button" class="evvx" id="evv-x" aria-label="Close preview">✕</button></div><div class="evvbody" id="evv-body"></div></div>
 </body></html>
