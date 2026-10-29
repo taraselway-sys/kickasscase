@@ -721,9 +721,12 @@ function rbPrint(){
 
 /* ================= case packet ================= */
 var PK=[['cover','Cover page',true],['complaint','Charge of discrimination (the Bureau\u2019s form)',true],['chron','Chronology',true],['index','Exhibit index',true],
-  ['thumbs','Thumbnails in the exhibit index',false],['docs','Correspondence log',true],['dates','Deadlines',true],
-  ['witnesses','Witness list (keep private unless you must share it)',false]];
-function pkState(){ D.packet=D.packet||{}; PK.forEach(function(p){ if(!(p[0] in D.packet)) D.packet[p[0]]=p[2]; }); return D.packet; }
+  ['thumbs','Thumbnails in the exhibit index',true],['witnesses','Witness list',true],['docs','Correspondence and filings',true],
+  ['records','Records requests',true],['dates','Deadlines',true]];
+function pkState(){ D.packet=D.packet||{};
+  // the case file holds everything: switch every part on once, including parts that were off before
+  if(!D.packet.allv2){ PK.forEach(function(p){ D.packet[p[0]]=true; }); D.packet.allv2=true; }
+  PK.forEach(function(p){ if(!(p[0] in D.packet)) D.packet[p[0]]=p[2]; }); return D.packet; }
 function renderPacket(){
   var box=$('pk-list'); if(!box) return; var s=pkState();
   box.innerHTML=PK.map(function(p){ return '<label class="rbchk"><input type="checkbox"'+(s[p[0]]?' checked':'')+
@@ -752,18 +755,24 @@ function buildPacket(){
       '<td class="loc">'+(e.f?'<div><b>'+esc(e.f)+'</b></div>':'')+(e.l?'<div>'+esc(e.l)+'</div>':'')+'</td></tr>'; }).join('');
     sec('Exhibit index', D.exhibits.length? tbl(s.thumbs?['','Thumbnail','Exhibit','File and location']:['','Exhibit','File and location'],rows2) : '<p>No exhibits yet.</p>');
   }
+  if(s.witnesses){
+    var rows5=D.witnesses.map(function(w,i){ return '<tr><td class="n">'+(i+1)+'</td><td><div class="wt">'+esc(w.n)+'</div>'+(w.r?'<div class="pv">'+esc(w.r)+'</div>':'')+
+      (w.k?'<div class="pv"><b>Can speak to:</b> '+esc(w.k)+'</div>':'')+(w.o?'<div class="pv"><b>Notes:</b> '+esc(w.o)+'</div>':'')+'</td>'+
+      '<td class="loc">'+esc(w.c||'')+'</td><td class="loc">'+esc(w.s||'Not approached')+'</td></tr>'; }).join('');
+    sec('Witness list', D.witnesses.length? tbl(['','Witness','Contact','Status'],rows5) : '<p>No witnesses listed.</p>');
+  }
   if(s.docs){
     var rows3=D.docs.map(function(e,i){ return '<tr><td class="n">'+(i+1)+'</td><td class="dcell">'+esc(e.d?niceDate(e.d):'')+'</td><td><div class="wt">'+esc(e.w)+'</div><div class="pv">'+esc(e.k||'')+(e.f?' \u00b7 '+esc(e.f):'')+'</div>'+
       (e.a?'<div class="pv"><b>Action:</b> '+esc(e.a)+'</div>':'')+(e.due?'<div class="pv"><b>Due:</b> '+esc(niceDate(e.due))+'</div>':'')+'</td><td class="loc">'+esc(e.l||'')+'</td></tr>'; }).join('');
     sec('Correspondence and filings', D.docs.length? tbl(['','Date','Document','Stored'],rows3) : '<p>Nothing logged yet.</p>');
   }
+  if(s.records){
+    var rows6=(D.requests||[]).map(function(r,i){ return '<tr><td class="n">'+(i+1)+'</td><td class="dcell">'+esc(r.date||'')+'</td><td><div class="wt">'+esc(r.what||'')+'</div></td><td class="loc">'+esc(r.to||'')+'</td></tr>'; }).join('');
+    sec('Records requests', rows6? tbl(['','Date asked','What I asked for','Sent to'],rows6) : '<p>No records requests logged.</p>');
+  }
   if(s.dates){
     var rows4=allDates().map(function(x){ return '<tr><td class="dcell">'+esc(niceDate(x.date))+'</td><td><div class="wt">'+esc(x.label)+'</div><div class="pv">'+esc(x.detail)+'</div></td></tr>'; }).join('');
     sec('Deadlines', rows4? tbl(['Date','What'],rows4) : '<p>No dates yet.</p>');
-  }
-  if(s.witnesses){
-    var rows5=D.witnesses.map(function(w,i){ return '<tr><td class="n">'+(i+1)+'</td><td><div class="wt">'+esc(w.n)+'</div>'+(w.r?'<div class="pv">'+esc(w.r)+'</div>':'')+(w.k?'<div class="pv"><b>Can speak to:</b> '+esc(w.k)+'</div>':'')+'</td><td class="loc">'+esc(w.s||'')+'</td></tr>'; }).join('');
-    sec('Witness list', D.witnesses.length? tbl(['','Witness','Status'],rows5) : '<p>No witnesses listed.</p>');
   }
   if(!parts.length && !s.cover){ alert('Pick at least one part to include.'); return; }
   var cover='';
@@ -863,7 +872,7 @@ function nextStep(){
   if(!D.exhibits.length) return ['exhibits','Log your first exhibit','Your files live in Google Drive. The index here is what makes them usable.','Open your evidence'];
   if(!D.stage) return ['stage','Mark where you are in the process','Tap the stage you are at to see what happens there and what to do now.','Where am I?'];
   if(hasWork() && (days===null||days>=7)) return ['backup',(lb?'It has been '+dayWord(days)+' since your last backup':'Back up your work'),'Everything you enter is stored only on this device. Keep a copy somewhere safe.','Back up now'];
-  return ['packet','Your case file is taking shape','Put the complaint, chronology, exhibit index and deadlines into one printable packet.','Build the case packet'];
+  return ['packet','Your case file is taking shape','Put the complaint, chronology, evidence, witnesses, correspondence, records requests and deadlines into one printable packet.','Build the case packet'];
 }
 function renderHome(){
   if(!$('dash-list')) return;
