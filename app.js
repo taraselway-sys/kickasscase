@@ -78,7 +78,8 @@ function show(id){
 }
 function openMenu(){ $('drop').classList.add('on'); $('scrim').classList.add('on'); }
 function closeMenu(){ $('drop').classList.remove('on'); $('scrim').classList.remove('on'); }
-function openMore(){ $('moresheet').classList.add('on'); $('morescrim').classList.add('on'); }
+var MORE_AT=0;
+function openMore(){ MORE_AT=Date.now(); $('moresheet').scrollTop=0; $('moresheet').classList.add('on'); $('morescrim').classList.add('on'); }
 function closeMore(){ $('moresheet').classList.remove('on'); $('morescrim').classList.remove('on'); }
 
 /* ---- deadline ---- */

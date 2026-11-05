@@ -1000,6 +1000,19 @@ function menuAct(it,close){
   return "show('"+k+"')";
 }
 function menuIcon(it){ var k=it[0]; return it[2]? ico(it[2]) : (k.indexOf(':')<0? vico(k) : ''); }
+/* The More sheet slides up under the finger that opened it. A second tap from the same touch
+   would land on the dark background or the Close button and shut it at once, so for the first
+   half-second after it opens, taps on the sheet and the background are ignored. */
+function initMoreSheet(){
+  ['moresheet','morescrim'].forEach(function(id){ var el=$(id); if(!el) return;
+    el.addEventListener('click',function(e){ if(Date.now()-MORE_AT<500){ e.stopPropagation(); e.preventDefault(); } },true); });
+  addMoreSearch();
+}
+function addMoreSearch(){
+  var ms=$('moresheet'); if(!ms || ms.querySelector('.srchwrap') || !window.searchBox) return;
+  var box=searchBox('Search everything'), mh=ms.querySelector('.mh');
+  if(mh) mh.parentNode.insertBefore(box, mh.nextSibling); else ms.insertBefore(box, ms.firstChild);
+}
 function buildMenus(){
   if(!window.ico) return;
   var drop=$('drop');
@@ -1184,6 +1197,7 @@ function initFeatures(){
   buildFurniture();
   layoutAllPages();
   initEvidenceViewer();
+  initMoreSheet();
   // show() also refreshes the new pages
   var _show=show;
   window.show=function(id){ _show(id);
