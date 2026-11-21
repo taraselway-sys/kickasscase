@@ -859,3 +859,11 @@ ul.srclist a{white-space:nowrap;font-weight:600}
 .legvid-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:rgba(22,48,79,.88);color:#f2b705;font-size:22px;line-height:54px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)}
 .legvid-btn:hover .legvid-play,.legvid-btn:focus-visible .legvid-play{background:#16304f;transform:translate(-50%,-50%) scale(1.06)}
 .legvid iframe{width:100%;aspect-ratio:9/16;border:0;border-radius:10px;background:#000;display:block}
+.legdocs{display:grid;grid-template-columns:1fr;gap:10px;margin:0 0 14px}
+@media(min-width:760px){.legdocs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.legdoc{display:flex;flex-direction:column;gap:4px;padding:15px 16px;border-radius:13px;background:linear-gradient(135deg,#16304f 0%,#1f4a7a 100%);color:#fff;text-decoration:none;box-shadow:0 2px 8px rgba(22,48,79,.18);border:1px solid #16304f;transition:transform .12s ease,box-shadow .12s ease}
+.legdoc:hover,.legdoc:focus-visible{transform:translateY(-2px);box-shadow:0 6px 16px rgba(22,48,79,.28);color:#fff}
+.legdoc-ic{font-size:20px;line-height:1}
+.legdoc-t{font-weight:700;font-size:16px;color:#fff}
+.legdoc-d{font-size:13.5px;color:#d9e3f0;line-height:1.35}
+.legdoc-go{margin-top:6px;font-size:13px;font-weight:700;color:#f2b705}
