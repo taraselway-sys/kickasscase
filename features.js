@@ -1252,3 +1252,17 @@ function initFeatures(){
     }).then(function(){ btn.disabled=false; });
   });
 })();
+
+/* Fix the Bureau videos: load the Google Drive player only after the person taps play. */
+(function(){
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.legvid-btn'); if(!b) return;
+    var id=b.getAttribute('data-vid'); if(!/^[A-Za-z0-9_-]+$/.test(id)) return;
+    var f=document.createElement('iframe');
+    f.src='https://drive.google.com/file/d/'+id+'/preview';
+    f.allow='autoplay; fullscreen'; f.setAttribute('allowfullscreen','');
+    f.title=(b.parentNode.querySelector('b')||{}).textContent||'Video';
+    f.loading='lazy'; f.referrerPolicy='no-referrer';
+    b.replaceWith(f);
+  });
+})();

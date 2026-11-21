@@ -851,3 +851,6 @@ button.dlink:active{background:var(--tint)}
 ul.srclist{margin:4px 0 14px;padding-left:18px}
 ul.srclist li{font-size:13px;line-height:1.5;margin:0 0 7px;color:#333}
 ul.srclist a{white-space:nowrap;font-weight:600}
+.legvid{border-top:1px solid var(--line);padding:10px 0 4px}
+.legvid p{margin:0 0 8px}
+.legvid iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000;display:block}
