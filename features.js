@@ -1261,7 +1261,7 @@ function initFeatures(){
     var f=document.createElement('iframe');
     f.src='https://drive.google.com/file/d/'+id+'/preview';
     f.allow='autoplay; fullscreen'; f.setAttribute('allowfullscreen','');
-    f.title=(b.parentNode.querySelector('b')||{}).textContent||'Video';
+    f.title=((b.parentNode.querySelector('b')||{}).textContent)||'Video';
     f.loading='lazy'; f.referrerPolicy='no-referrer';
     b.replaceWith(f);
   });
