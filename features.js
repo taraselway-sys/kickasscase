@@ -990,6 +990,7 @@ var MENU=[
  ['Family court',[['parenting','Parenting plan'],['decree','Divorce decree']]],
  ['Human Rights Bureau',[['complaint','The complaint'],['stage','Where am I?'],['rebuttal','The rebuttal'],['damages','What you are owed'],['mediation','Mediation'],['nocause','If you get “no reasonable cause”']]],
  ['Support',[['ai','Working with Claude'],['care','Looking after yourself'],['blamed','Why They Blame You'],['checklist','Progress checklist']]],
+ ['Take action',[['legislature','Fix the Bureau: the 2027 Legislature']]],
  ['Your saved work',[['act:exportAll()','Back up my work','download'],['act:document.getElementById(\'imp\').click()','Restore from a backup','upload']]],
  ['The full guide (Human Rights Bureau cases)',[['learn','Pro Se Power! — read the whole guide'],['url:'+GUIDE_PDF,'Pro Se Power! Guide & Workbook (PDF)','book-open'],['url:'+SHEETS_PDF,'Blank worksheets only (PDF)','file-text']]],
  ['About',[['terms','Terms and disclaimer']]]];
@@ -1111,7 +1112,7 @@ function buildFurniture(){
    the working tools come first, and reading cards fold into expandable panels. */
 var PAGE_ICONS={deadline:'◷',timeline:'☰',exhibits:'▣',witnesses:'✎',docs:'✉',records:'▤',complaint:'☑',
   stage:'◴',rebuttal:'⇄',damages:'¤',mediation:'⚖',nocause:'⚠',ai:'⌘',care:'❦',checklist:'✓',
-  howto:'ⓘ',blamed:'◉',court:'▧',parenting:'♡',decree:'⧉',dates:'⧗',packet:'⎘',terms:'©',learn:'§'};
+  howto:'ⓘ',blamed:'◉',legislature:'⚑',court:'▧',parenting:'♡',decree:'⧉',dates:'⧗',packet:'⎘',terms:'©',learn:'§'};
 function wordsIn(el){ return (el.textContent||'').trim().split(/\s+/).filter(Boolean).length; }
 function cardToPanel(card){
   var h=card.querySelector(':scope > h3, :scope > h4'), title='';
@@ -1220,8 +1221,34 @@ function initFeatures(){
   var _calc=calcDeadline; window.calcDeadline=function(){ _calc(); renderHomeDates(); };
   renderClaimWizard(); updateMeter(); renderRebuttal(); renderPacket(); renderDates(); renderHome();
   // a shared link can open one page directly: kickasscase.netlify.app/notyourfault -> /?page=notyourfault
-  try{ var pq=new URLSearchParams(location.search).get('page'); var PAGE_ALIAS={notyourfault:'blamed'};
+  try{ var pq=new URLSearchParams(location.search).get('page'); var PAGE_ALIAS={notyourfault:'blamed',legislature:'legislature',fixthebureau:'legislature'};
     var pid=pq&&(PAGE_ALIAS[pq]||pq);
     if(pid && document.getElementById('v-'+pid)){ setTimeout(function(){ show(pid); window.scrollTo(0,0); },0); }
   }catch(e){}
 }
+
+
+/* ================= Fix the Bureau page: the one form in this app that sends anything =================
+   It posts to Netlify Forms on this same site (connect-src 'self'), so the page's
+   rule that nothing goes to any other site still holds. */
+(function(){
+  var form=document.getElementById('leg-form'); if(!form) return;
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var msg=document.getElementById('lg-msg'), btn=document.getElementById('lg-send');
+    var need=['lg-name','lg-email','lg-story'];
+    for(var i=0;i<need.length;i++){ var el=document.getElementById(need[i]); if(!el.value.trim()){ msg.textContent='Please fill in your name, email and what happened.'; el.focus(); return; } }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('lg-email').value.trim())){ msg.textContent='Please check your email address.'; return; }
+    if(!document.getElementById('lg-ok').checked){ msg.textContent='Please check the box to confirm you understand this form sends what you wrote to Tara.'; return; }
+    var file=document.getElementById('lg-file').files[0];
+    if(file && file.size>8*1024*1024){ msg.textContent='That file is larger than 8 MB. Please choose a smaller one, or send the form without it.'; return; }
+    var data=new FormData(form); data.set('form-name','legislature-submission');
+    btn.disabled=true; msg.textContent='Sending…';
+    fetch('/',{method:'POST',body:data}).then(function(r){
+      if(!r.ok) throw new Error(r.status);
+      form.reset(); msg.textContent='Thank you. Your information was sent to Tara.';
+    }).catch(function(){
+      msg.textContent='It did not send. Please check your connection and try again.';
+    }).then(function(){ btn.disabled=false; });
+  });
+})();
