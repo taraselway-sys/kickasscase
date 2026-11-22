@@ -1266,3 +1266,61 @@ function initFeatures(){
     b.replaceWith(f);
   });
 })();
+
+/* Write your legislators: builds a letter on this device only. Nothing is sent anywhere. */
+(function(){
+  var make=document.getElementById('lw-make'); if(!make) return;
+  function v(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
+  function today(){ var d=new Date(); var m=['January','February','March','April','May','June','July','August','September','October','November','December']; return m[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
+  function build(){
+    var name=v('lw-name'), town=v('lw-town'), to=v('lw-to'), own=v('lw-own'), em=v('lw-email'), ph=v('lw-phone');
+    var where=town?(town+', Montana'):'Montana';
+    var L=[];
+    L.push(today()); L.push('');
+    L.push('Dear '+(to||'Montana Legislator')+':'); L.push('');
+    L.push('My name is '+(name||'[your name]')+', and I live in '+where+'. I am writing to ask you to support a 2027 bill to fix the Montana Human Rights Bureau.'); L.push('');
+    L.push('The Montana Human Rights Act asks the Bureau one threshold question: is there reasonable cause to believe the evidence supports a charge? The Bureau’s rules and its dismissal form ask something different. They require that the allegations be “supported by a preponderance of the evidence,” the standard for a hearing. In fiscal year 2026, the Bureau found no reasonable cause in 235 cases and reasonable cause in 47.'); L.push('');
+    L.push('Please support legislation that would:');
+    L.push('• Restore the statute’s reasonable-cause standard at the investigation stage.');
+    L.push('• Require the Bureau to judge a hostile work environment by the totality of the circumstances, weighing every act together.');
+    L.push('• Protect the medical information of people who file.');
+    L.push('• Require the employer’s law firm and the Department to disclose in writing when that firm has also worked for the Department.');
+    L.push('• Publish the Bureau’s outcomes every year and audit the Bureau.'); L.push('');
+    if(own){ L.push(own); L.push(''); }
+    L.push('You can read the information sheet and proposed bill language at kickasscase.netlify.app/fixthebureau.'); L.push('');
+    L.push('Thank you for your time.'); L.push('');
+    L.push('Sincerely,'); L.push('');
+    L.push(name||'[your name]'); L.push(where);
+    if(em) L.push(em); if(ph) L.push(ph);
+    return L.join('\n');
+  }
+  function msg(t){ var m=document.getElementById('lw-msg'); if(m) m.textContent=t; }
+  make.addEventListener('click',function(){
+    if(!v('lw-name')){ alertName(); return; }
+    document.getElementById('lw-letter').value=build();
+    document.getElementById('lw-out').hidden=false; msg('');
+    document.getElementById('lw-letter').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  function alertName(){ var n=document.getElementById('lw-name'); n.focus(); var o=document.getElementById('lw-out'); o.hidden=false; msg('Please type your name first, then tap Write my letter.'); }
+  function text(){ return document.getElementById('lw-letter').value; }
+  document.getElementById('lw-mail').addEventListener('click',function(){
+    var to=v('lw-toemail').replace(/\s+/g,'');
+    var href='mailto:'+encodeURI(to)+'?subject='+encodeURIComponent('Please support a bill to fix the Montana Human Rights Bureau')+'&body='+encodeURIComponent(text());
+    window.location.href=href;
+    msg('Your email app should open with the letter. If it does not, use Copy it and paste the letter into an email.');
+  });
+  document.getElementById('lw-copy').addEventListener('click',function(){
+    var t=text();
+    function done(){ msg('Copied. Paste it into an email or a document.'); }
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(done,fallback); } else fallback();
+    function fallback(){ var a=document.getElementById('lw-letter'); a.focus(); a.select(); try{ document.execCommand('copy'); done(); }catch(e){ msg('Select the letter and copy it.'); } }
+  });
+  document.getElementById('lw-print').addEventListener('click',function(){
+    var pv=document.getElementById('lw-pv'); pv.innerHTML='';
+    var d=document.createElement('div'); d.className='lwdoc';
+    text().split(/\n\n+/).forEach(function(para){ var p=document.createElement('p'); para.split('\n').forEach(function(line,i){ if(i) p.appendChild(document.createElement('br')); p.appendChild(document.createTextNode(line)); }); d.appendChild(p); });
+    pv.appendChild(d);
+    if(typeof printInPlace==='function') printInPlace('lw-pv'); else window.print();
+  });
+  window.addEventListener('afterprint',function(){ var pv=document.getElementById('lw-pv'); if(pv){ setTimeout(function(){ pv.style.display='none'; pv.innerHTML=''; },350); } });
+})();

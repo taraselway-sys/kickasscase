@@ -1482,6 +1482,25 @@ so nothing will work until it runs.</div></noscript>
 <p class="gterm"><b>Contact your legislators</b> &mdash; tell your own state representative and senator that you support fixing the Bureau. You can find them at <a href="https://leg.mt.gov/" target="_blank" rel="noopener">leg.mt.gov</a>.</p>
 <p class="gterm"><b>Share this page</b> &mdash; kickasscase.netlify.app/fixthebureau</p></div>
 
+<div class="card" id="leg-write-card"><h3>Write your legislators</h3>
+<p>Fill this in and the app writes a letter to your state legislators in your name. You can email it, print it, or copy it. <b>Nothing you type here is sent anywhere.</b> It stays on your device until you send the letter yourself.</p>
+<p>Find your state senator and representative by entering your address on the <a href="https://www.legmt.gov/districts/" target="_blank" rel="noopener">Montana Legislature district map</a>, or browse the <a href="https://legmt.gov/legislators" target="_blank" rel="noopener">legislator list</a> for their email addresses.</p>
+<label class="fl" for="lw-name">Your name</label><input type="text" id="lw-name" autocomplete="name">
+<label class="fl" for="lw-town">Your town</label><input type="text" id="lw-town" autocomplete="address-level2" placeholder="Hamilton">
+<label class="fl" for="lw-email">Your email (optional, goes under your name)</label><input type="email" id="lw-email" autocomplete="email">
+<label class="fl" for="lw-phone">Your phone (optional, goes under your name)</label><input type="tel" id="lw-phone" autocomplete="tel">
+<label class="fl" for="lw-to">Your legislators&rsquo; names (optional)</label><input type="text" id="lw-to" placeholder="Senator Jane Smith and Representative John Doe">
+<label class="fl" for="lw-toemail">Their email addresses (optional, for the Email button; separate with commas)</label><input type="text" id="lw-toemail" inputmode="email">
+<label class="fl" for="lw-own">Add your own words (optional)</label><textarea id="lw-own" rows="4" placeholder="Why this matters to you, in a few sentences."></textarea>
+<p style="margin-top:12px"><button type="button" class="pri" id="lw-make">Write my letter</button></p>
+<div id="lw-out" hidden>
+<label class="fl" for="lw-letter">Your letter (you can edit it here)</label><textarea id="lw-letter" rows="18"></textarea>
+<p class="lw-btns"><button type="button" class="pri" id="lw-mail">Email it</button> <button type="button" class="sec" id="lw-print">Print it</button> <button type="button" class="sec" id="lw-copy">Copy it</button></p>
+<p id="lw-msg" role="status" aria-live="polite"></p>
+</div>
+<div id="lw-pv" class="printout" style="display:none"></div>
+</div>
+
 <div class="card" id="leg-form-card"><h3>Send me your information</h3>
 <p><b>This form is different from the rest of this app.</b> Everything else here stays on your device. What you type in this form is sent to me, Tara Walker, so I can add it to this effort. Do not send anything you are not comfortable sharing with me. I will not publish your name or details without your permission.</p>
 <form name="legislature-submission" id="leg-form" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" novalidate>
