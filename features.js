@@ -1281,11 +1281,17 @@ function initFeatures(){
     L.push('My name is '+(name||'[your name]')+', and I live in '+where+'. I am writing to ask you to support a 2027 bill to fix the Montana Human Rights Bureau.'); L.push('');
     L.push('The Montana Human Rights Act asks the Bureau one threshold question: is there reasonable cause to believe the evidence supports a charge? The Bureau’s rules and its dismissal form ask something different. They require that the allegations be “supported by a preponderance of the evidence,” the standard for a hearing. In fiscal year 2026, the Bureau found no reasonable cause in 235 cases and reasonable cause in 47.'); L.push('');
     L.push('Please support legislation that would:');
-    L.push('• Restore the statute’s reasonable-cause standard at the investigation stage.');
-    L.push('• Require the Bureau to judge a hostile work environment by the totality of the circumstances, weighing every act together.');
-    L.push('• Protect the medical information of people who file.');
-    L.push('• Require the employer’s law firm and the Department to disclose in writing when that firm has also worked for the Department.');
-    L.push('• Publish the Bureau’s outcomes every year and audit the Bureau.'); L.push('');
+    L.push('\u2022 Restore the statute\u2019s reasonable-cause standard at the investigation stage, and make the Bureau\u2019s rules and forms match it.');
+    L.push('\u2022 Send complaints about Bureau staff or a State agency to an independent investigator outside the Department.');
+    L.push('\u2022 Require the employer\u2019s law firm and the Department to disclose in writing when that firm has worked for the Department, and let a person replace a conflicted investigator.');
+    L.push('\u2022 Keep the medical information of people who file confidential.');
+    L.push('\u2022 Stop counting assistive tools against people with disabilities.');
+    L.push('\u2022 Offer written intake to people whose disability makes phone intake hard.');
+    L.push('\u2022 Log every piece of evidence and tie it to the claim it supports in the report.');
+    L.push('\u2022 Judge a hostile work environment by the totality of the circumstances, weighing every act together.');
+    L.push('\u2022 Publish the Bureau\u2019s outcomes every year.');
+    L.push('\u2022 Audit the Bureau and fund the fix.');
+    L.push('');
     if(own){ L.push(own); L.push(''); }
     L.push('You can read the information sheet and proposed bill language at kickasscase.netlify.app/fixthebureau.'); L.push('');
     L.push('Thank you for your time.'); L.push('');

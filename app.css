@@ -871,6 +871,6 @@ ul.srclist a{white-space:nowrap;font-weight:600}
 #leg-write-card .lw-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 #leg-write-card textarea#lw-letter{font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.45}
 #lw-msg{font-size:14px;color:var(--navy);margin-top:6px}
-.lwdoc{font-family:Georgia,'Times New Roman',serif;font-size:11.5pt;line-height:1.45;color:#111;max-width:6.5in;margin:0 auto}
-.lwdoc p{margin:0 0 10pt}
-@media print{.lwdoc{padding:.6in .2in}}
+.lwdoc{font-family:Georgia,"Times New Roman",serif;font-size:10.5pt;line-height:1.35;color:#111;max-width:6.5in;margin:0 auto}
+.lwdoc p{margin:0 0 8pt}
+@media print{.lwdoc{padding:.35in .15in}}
